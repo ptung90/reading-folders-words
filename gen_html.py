@@ -1,0 +1,358 @@
+# -*- coding: utf-8 -*-
+# Build reading-folders.html from reading-folders-data.json (data embedded inline).
+# Run:  python gen_html.py
+import json, io, os
+
+HERE = os.path.dirname(os.path.abspath(__file__))
+SRC = os.path.join(HERE, "reading-folders-data.json")
+OUT = os.path.join(HERE, "reading-folders.html")
+
+data = json.load(io.open(SRC, encoding="utf-8"))
+data_js = json.dumps(data, ensure_ascii=False)
+
+html = r"""<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading Folders — Printable Cards</title>
+<style>
+  :root{
+    --red:#d32f2f;
+    --blue:#1565c0;
+    --ink:#1a1a1a;
+    --cut:#b0b0b0;
+  }
+  *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:"Segoe UI",Arial,sans-serif; color:var(--ink); background:#eceef1; }
+
+  /* ---- downloaded preview fonts ---- */
+  @font-face{ font-family:"KG Primary Dots";       src:url("fonts/KGPrimaryDots.ttf") format("truetype"); }
+  @font-face{ font-family:"KG Primary Dots Lined"; src:url("fonts/KGPrimaryDotsLined.ttf") format("truetype"); }
+  @font-face{ font-family:"DotNess";               src:url("fonts/DotNess.ttf") format("truetype"); }
+  @font-face{ font-family:"DashNess";              src:url("fonts/DashNess.ttf") format("truetype"); }
+  @font-face{ font-family:"LMS Spelling Bee";      src:url("fonts/LMSSpellingBee.ttf") format("truetype"); }
+  @font-face{ font-family:"Jardotty";              src:url("fonts/Jardotty.ttf") format("truetype"); }
+  @font-face{ font-family:"Jarman";                src:url("fonts/Jarman.ttf") format("truetype"); }
+  @font-face{ font-family:"Cursive Standard";      src:url("fonts/CursiveStandard.ttf") format("truetype"); font-weight:400; }
+  @font-face{ font-family:"Cursive Standard";      src:url("fonts/CursiveStandardBold.ttf") format("truetype"); font-weight:700; }
+
+  /* ---- word content fonts (togglable) ---- */
+  .wcard .w,.grouphead .g,.gcard .head .g,.gcard .words{
+    font-family:"Century Gothic","Trebuchet MS",Arial,sans-serif;  /* print / manuscript */
+  }
+  body.cursive .wcard .w,
+  body.cursive .grouphead .g,
+  body.cursive .gcard .head .g,
+  body.cursive .gcard .words{
+    font-family:"Segoe Script","Bradley Hand","Lucida Handwriting","Comic Sans MS",cursive;
+  }
+  body.cursive .wcard .w{ font-size:27px; }
+  body.cursive .gcard .words{ font-size:15px; line-height:1.95; }
+  body.cursive .grouphead .g,body.cursive .gcard .head .g{ font-size:30px; }
+
+  /* downloaded fonts tend to need a size bump vs. the print default */
+  body.font-kg-primary-dots .wcard .w,
+  body.font-kg-primary-dots-lined .wcard .w,
+  body.font-dotness .wcard .w,
+  body.font-dashness .wcard .w,
+  body.font-lms-spelling-bee .wcard .w,
+  body.font-jardotty .wcard .w,
+  body.font-jarman .wcard .w,
+  body.font-cursive-standard .wcard .w{ font-size:28px; }
+  body.font-kg-primary-dots .gcard .words,
+  body.font-kg-primary-dots-lined .gcard .words,
+  body.font-dotness .gcard .words,
+  body.font-dashness .gcard .words,
+  body.font-lms-spelling-bee .gcard .words,
+  body.font-jardotty .gcard .words,
+  body.font-jarman .gcard .words,
+  body.font-cursive-standard .gcard .words{ font-size:16px; line-height:1.9; }
+  body.font-kg-primary-dots .grouphead .g, body.font-kg-primary-dots .gcard .head .g,
+  body.font-kg-primary-dots-lined .grouphead .g, body.font-kg-primary-dots-lined .gcard .head .g,
+  body.font-dotness .grouphead .g, body.font-dotness .gcard .head .g,
+  body.font-dashness .grouphead .g, body.font-dashness .gcard .head .g,
+  body.font-lms-spelling-bee .grouphead .g, body.font-lms-spelling-bee .gcard .head .g,
+  body.font-jardotty .grouphead .g, body.font-jardotty .gcard .head .g,
+  body.font-jarman .grouphead .g, body.font-jarman .gcard .head .g,
+  body.font-cursive-standard .grouphead .g, body.font-cursive-standard .gcard .head .g{ font-size:32px; }
+
+  body.font-kg-primary-dots .wcard .w,.wcard .w{ }
+  body.font-kg-primary-dots .wcard .w{ font-family:"KG Primary Dots",cursive; }
+  body.font-kg-primary-dots .grouphead .g,body.font-kg-primary-dots .gcard .head .g,body.font-kg-primary-dots .gcard .words{ font-family:"KG Primary Dots",cursive; }
+
+  body.font-kg-primary-dots-lined .wcard .w{ font-family:"KG Primary Dots Lined",cursive; }
+  body.font-kg-primary-dots-lined .grouphead .g,body.font-kg-primary-dots-lined .gcard .head .g,body.font-kg-primary-dots-lined .gcard .words{ font-family:"KG Primary Dots Lined",cursive; }
+
+  body.font-dotness .wcard .w{ font-family:"DotNess",cursive; }
+  body.font-dotness .grouphead .g,body.font-dotness .gcard .head .g,body.font-dotness .gcard .words{ font-family:"DotNess",cursive; }
+
+  body.font-dashness .wcard .w{ font-family:"DashNess",cursive; }
+  body.font-dashness .grouphead .g,body.font-dashness .gcard .head .g,body.font-dashness .gcard .words{ font-family:"DashNess",cursive; }
+
+  body.font-lms-spelling-bee .wcard .w{ font-family:"LMS Spelling Bee",cursive; }
+  body.font-lms-spelling-bee .grouphead .g,body.font-lms-spelling-bee .gcard .head .g,body.font-lms-spelling-bee .gcard .words{ font-family:"LMS Spelling Bee",cursive; }
+
+  body.font-jardotty .wcard .w{ font-family:"Jardotty",cursive; }
+  body.font-jardotty .grouphead .g,body.font-jardotty .gcard .head .g,body.font-jardotty .gcard .words{ font-family:"Jardotty",cursive; }
+
+  body.font-jarman .wcard .w{ font-family:"Jarman",cursive; }
+  body.font-jarman .grouphead .g,body.font-jarman .gcard .head .g,body.font-jarman .gcard .words{ font-family:"Jarman",cursive; }
+
+  body.font-cursive-standard .wcard .w{ font-family:"Cursive Standard",cursive; }
+  body.font-cursive-standard .grouphead .g,body.font-cursive-standard .gcard .head .g,body.font-cursive-standard .gcard .words{ font-family:"Cursive Standard",cursive; }
+
+  /* ---------- Toolbar (screen only) ---------- */
+  .toolbar{
+    position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid #d5d9df;
+    padding:12px 18px; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;
+    box-shadow:0 1px 6px rgba(0,0,0,.08);
+  }
+  .toolbar h1{ font-size:16px; margin:0 12px 0 0; align-self:center; }
+  .tb-group{ display:flex; flex-direction:column; gap:4px; font-size:12px; }
+  .tb-group b{ font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:#667; }
+  .tb-group label{ font-weight:400; margin-right:8px; white-space:nowrap; }
+  .folders-filter{ max-width:520px; flex-wrap:wrap; display:flex; gap:2px 10px; }
+  button.print{
+    margin-left:auto; background:var(--blue); color:#fff; border:0; border-radius:6px;
+    padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  button.print:hover{ filter:brightness(1.08); }
+  .hint{ font-size:12px; color:#667; padding:8px 18px 0; }
+
+  /* ---------- Print sheet ---------- */
+  .sheet{ background:#fff; margin:16px auto; padding:12mm; width:210mm; min-height:297mm;
+          box-shadow:0 2px 12px rgba(0,0,0,.12); }
+  .section-title{ font-size:15px; font-weight:700; color:var(--blue); margin:0 0 8px;
+                  border-bottom:2px solid var(--blue); padding-bottom:4px; }
+
+  /* group header inside word-card grid */
+  .grouphead{ grid-column:1/-1; display:flex; align-items:baseline; gap:10px;
+              margin:10px 0 2px; padding-bottom:2px; border-bottom:1px solid #e2e2e2; }
+  .grouphead .g{ font-size:20px; font-weight:800; color:var(--red); }
+  .grouphead .k{ font-size:11px; color:#889; text-transform:uppercase; letter-spacing:.5px; }
+
+  /* ---------- Word cards (cut grid) ---------- */
+  .wordgrid{ display:grid; grid-template-columns:repeat(3,1fr);
+             border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
+  .wcard{ position:relative; border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
+          min-height:2.3cm; display:flex; align-items:center; justify-content:center; padding:6px 4px;
+          break-inside:avoid; }
+  .wcard .w{ font-size:23px; font-weight:700; letter-spacing:.5px; }
+  .wcard .tag{ position:absolute; top:3px; left:5px; font-size:9px; color:#c3c3c3; letter-spacing:.3px; }
+
+  /* ---------- Grapheme list cards ---------- */
+  .gcardgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:8mm; }
+  .gcard{ border:1.5px solid #444; border-radius:7px; padding:10px 12px 12px; break-inside:avoid; }
+  .gcard .head{ display:flex; align-items:baseline; gap:8px; border-bottom:1.5px solid #eee;
+                margin-bottom:6px; padding-bottom:5px; }
+  .gcard .head .g{ font-size:26px; font-weight:800; color:var(--red); line-height:1; }
+  .gcard .head .k{ font-size:11px; color:var(--blue); text-transform:uppercase; letter-spacing:.6px; }
+  .gcard .head .n{ margin-left:auto; font-size:10px; color:#aab; }
+  .gcard .words{ columns:2; column-gap:14px; font-size:13px; line-height:1.65; }
+  .gcard .words .w{ break-inside:avoid; }
+
+  /* the highlighted grapheme */
+  .sound{ color:var(--red); }
+
+  /* ---------- Font weight override ---------- */
+  body.fw-normal .wcard .w,
+  body.fw-normal .grouphead .g,
+  body.fw-normal .gcard .head .g,
+  body.fw-normal .gcard .words{ font-weight:400 !important; }
+  body.fw-bold .wcard .w,
+  body.fw-bold .grouphead .g,
+  body.fw-bold .gcard .head .g,
+  body.fw-bold .gcard .words{ font-weight:700 !important; }
+
+  /* ---------- Fake italic (synthetic oblique) ---------- */
+  body.fake-italic .wcard .w,
+  body.fake-italic .grouphead .g,
+  body.fake-italic .gcard .head .g,
+  body.fake-italic .gcard .words{ font-style:italic !important; }
+
+  /* ---------- Black & white mode ---------- */
+  body.bw .sound{ color:#000; font-weight:800; text-decoration:underline; text-underline-offset:2px; }
+  body.bw .grouphead .g, body.bw .gcard .head .g{ color:#000; }
+  body.bw .gcard .head .k{ color:#000; }
+  body.bw .section-title{ color:#000; border-color:#000; }
+
+  .hidden{ display:none !important; }
+
+  @page{ size:A4; margin:12mm; }
+  @media print{
+    body{ background:#fff; }
+    .toolbar,.hint{ display:none !important; }
+    .sheet{ margin:0; padding:0; width:auto; min-height:0; box-shadow:none; }
+    .sheet + .sheet{ break-before:page; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Reading Folders</h1>
+  <div class="tb-group">
+    <b>View</b>
+    <div>
+      <label><input type="radio" name="view" value="both" checked> Cả hai</label>
+      <label><input type="radio" name="view" value="words"> Thẻ từ</label>
+      <label><input type="radio" name="view" value="graphemes"> Thẻ grapheme</label>
+    </div>
+  </div>
+  <div class="tb-group">
+    <b>Font</b>
+    <select id="fontSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
+      <option value="print">Chữ in (print)</option>
+      <option value="cursive">Chữ viết (system cursive)</option>
+      <option value="jarman">Jarman</option>
+      <option value="jardotty">Jardotty (dotted)</option>
+      <option value="lms-spelling-bee">LMS Spelling Bee (dotted)</option>
+      <option value="kg-primary-dots">KG Primary Dots</option>
+      <option value="kg-primary-dots-lined">KG Primary Dots Lined</option>
+      <option value="dotness">DotNess</option>
+      <option value="dashness">DashNess</option>
+      <option value="cursive-standard">Cursive Standard</option>
+    </select>
+  </div>
+  <div class="tb-group">
+    <b>Độ đậm</b>
+    <select id="weightSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
+      <option value="auto">Mặc định</option>
+      <option value="normal">Normal (400)</option>
+      <option value="bold">Bold (700)</option>
+    </select>
+  </div>
+  <div class="tb-group">
+    <b>Kiểu</b>
+    <label><input type="checkbox" id="italicChk"> Nghiêng (italic giả)</label>
+  </div>
+  <div class="tb-group">
+    <b>Màu</b>
+    <div>
+      <label><input type="radio" name="color" value="red" checked> Đỏ (Montessori)</label>
+      <label><input type="radio" name="color" value="bw"> Đen trắng</label>
+    </div>
+  </div>
+  <div class="tb-group">
+    <b>Folders</b>
+    <div class="folders-filter" id="folderFilter"></div>
+  </div>
+  <button class="print" onclick="window.print()">🖨️ In / Lưu PDF</button>
+</div>
+<div class="hint">Mẹo in PDF: nhấn nút trên (hoặc Ctrl/Cmd+P) → chọn <b>Save as PDF</b> → khổ <b>A4</b> → bật <b>Background graphics</b> để giữ màu đỏ và viền cắt.</div>
+
+<div id="app"></div>
+
+<script>
+const DATA = __DATA__;
+
+// "b[ai]t" -> "b<span class='sound'>ai</span>t"
+function renderWord(w){
+  return w.split(/\[([^\]]+)\]/).map((seg,i)=> i%2 ? '<span class="sound">'+seg+'</span>' : seg).join('');
+}
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+const app = document.getElementById('app');
+const filterBox = document.getElementById('folderFilter');
+
+// build folder filter checkboxes (only folders that have any words)
+const nonEmpty = DATA.folders.filter(f => f.cards.some(c=>c.words.length));
+nonEmpty.forEach(f=>{
+  const id='f_'+f.keySound;
+  const lbl=document.createElement('label');
+  lbl.innerHTML='<input type="checkbox" value="'+f.keySound+'" checked> '+f.keySound;
+  filterBox.appendChild(lbl);
+});
+
+function selectedFolders(){
+  return [...filterBox.querySelectorAll('input:checked')].map(i=>i.value);
+}
+function currentView(){ return document.querySelector('input[name=view]:checked').value; }
+
+function render(){
+  const sel = new Set(selectedFolders());
+  const view = currentView();
+  const folders = DATA.folders.filter(f=> sel.has(f.keySound) && f.cards.some(c=>c.words.length));
+  let out='';
+
+  // ---- Section 1: word cards ----
+  if(view==='both' || view==='words'){
+    out += '<div class="sheet"><div class="section-title">Thẻ từ (cắt rời) — Word cards</div><div class="wordgrid">';
+    folders.forEach(f=>{
+      f.cards.filter(c=>c.words.length).forEach(c=>{
+        out += '<div class="grouphead"><span class="g">'+esc(c.grapheme)+'</span>'
+             + '<span class="k">folder: '+esc(f.keySound)+'</span></div>';
+        c.words.forEach(w=>{
+          out += '<div class="wcard"><span class="tag">'+esc(c.grapheme)+'</span>'
+               + '<span class="w">'+renderWord(esc(w))+'</span></div>';
+        });
+      });
+    });
+    out += '</div></div>';
+  }
+
+  // ---- Section 2: grapheme list cards ----
+  if(view==='both' || view==='graphemes'){
+    out += '<div class="sheet"><div class="section-title">Thẻ theo grapheme — Grapheme cards</div><div class="gcardgrid">';
+    folders.forEach(f=>{
+      f.cards.filter(c=>c.words.length).forEach(c=>{
+        out += '<div class="gcard"><div class="head"><span class="g">'+esc(c.grapheme)+'</span>'
+             + '<span class="k">folder '+esc(f.keySound)+'</span>'
+             + '<span class="n">'+c.words.length+' words</span></div><div class="words">';
+        c.words.forEach(w=>{ out += '<div class="w">'+renderWord(esc(w))+'</div>'; });
+        out += '</div></div>';
+      });
+    });
+    out += '</div></div>';
+  }
+
+  app.innerHTML = out;
+}
+
+filterBox.addEventListener('change', render);
+document.querySelectorAll('input[name=view]').forEach(r=>r.addEventListener('change', render));
+document.querySelectorAll('input[name=color]').forEach(r=>r.addEventListener('change', e=>{
+  document.body.classList.toggle('bw', e.target.value==='bw');
+}));
+
+// font toggle, also settable via ?font=xxx for headless export
+const fontSel = document.getElementById('fontSel');
+const FONT_CLASSES = ['cursive','font-jarman','font-jardotty','font-lms-spelling-bee',
+  'font-kg-primary-dots','font-kg-primary-dots-lined','font-dotness','font-dashness','font-cursive-standard'];
+function applyFont(v){
+  document.body.classList.remove(...FONT_CLASSES);
+  if(v && v!=='print') document.body.classList.add(v==='cursive' ? 'cursive' : 'font-'+v);
+}
+fontSel.addEventListener('change', e=>applyFont(e.target.value));
+const _f = new URLSearchParams(location.search).get('font');
+if(_f){ fontSel.value = _f; applyFont(_f); }
+
+// font-weight override, also settable via ?weight=xxx
+const weightSel = document.getElementById('weightSel');
+function applyWeight(v){
+  document.body.classList.remove('fw-normal','fw-bold');
+  if(v==='normal') document.body.classList.add('fw-normal');
+  if(v==='bold') document.body.classList.add('fw-bold');
+}
+weightSel.addEventListener('change', e=>applyWeight(e.target.value));
+const _w = new URLSearchParams(location.search).get('weight');
+if(_w){ weightSel.value = _w; applyWeight(_w); }
+
+// fake italic toggle, also settable via ?italic=1
+const italicChk = document.getElementById('italicChk');
+italicChk.addEventListener('change', e=>{
+  document.body.classList.toggle('fake-italic', e.target.checked);
+});
+if(new URLSearchParams(location.search).get('italic')==='1'){ italicChk.checked = true; document.body.classList.add('fake-italic'); }
+
+render();
+</script>
+</body>
+</html>
+"""
+
+html = html.replace("__DATA__", data_js)
+io.open(OUT, "w", encoding="utf-8").write(html)
+print("Wrote", OUT, "-", len(html), "bytes")
