@@ -140,11 +140,10 @@ html = r"""<!DOCTYPE html>
   /* ---------- Word cards (cut grid) ---------- */
   .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,var(--card-w));
              border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
-  .wcard{ position:relative; width:var(--card-w); height:var(--card-h); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
+  .wcard{ width:var(--card-w); height:var(--card-h); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
           display:flex; align-items:center; justify-content:center; padding:6px 4px;
           break-inside:avoid; }
   .wcard .w{ font-size:var(--word-fs); font-weight:700; letter-spacing:.5px; }
-  .wcard .tag{ position:absolute; top:6px; left:8px; font-size:12px; color:#c3c3c3; letter-spacing:.3px; }
 
   /* ---------- Grapheme list cards ---------- */
   .gcardgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:8mm; }
@@ -319,8 +318,7 @@ function render(){
         out += '<div class="grouphead"><span class="g">'+esc(c.grapheme)+'</span>'
              + '<span class="k">folder: '+esc(f.keySound)+'</span></div>';
         c.words.forEach(w=>{
-          out += '<div class="wcard"><span class="tag">'+esc(c.grapheme)+'</span>'
-               + '<span class="w">'+renderWord(esc(w))+'</span></div>';
+          out += '<div class="wcard"><span class="w">'+renderWord(esc(w))+'</span></div>';
         });
       });
     });
