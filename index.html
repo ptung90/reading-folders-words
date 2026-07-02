@@ -1,0 +1,396 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Reading Folders — Printable Cards</title>
+<style>
+  :root{
+    --red:#d32f2f;
+    --blue:#1565c0;
+    --ink:#1a1a1a;
+    --cut:#b0b0b0;
+    --card-w:10cm;
+    --card-h:7cm;
+    --word-fs:42px;
+  }
+  *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
+  html,body{ margin:0; padding:0; }
+  body{ font-family:"Segoe UI",Arial,sans-serif; color:var(--ink); background:#eceef1; }
+
+  /* ---- downloaded preview fonts ---- */
+  @font-face{ font-family:"KG Primary Dots";       src:url("fonts/KGPrimaryDots.ttf") format("truetype"); }
+  @font-face{ font-family:"KG Primary Dots Lined"; src:url("fonts/KGPrimaryDotsLined.ttf") format("truetype"); }
+  @font-face{ font-family:"DotNess";               src:url("fonts/DotNess.ttf") format("truetype"); }
+  @font-face{ font-family:"DashNess";              src:url("fonts/DashNess.ttf") format("truetype"); }
+  @font-face{ font-family:"LMS Spelling Bee";      src:url("fonts/LMSSpellingBee.ttf") format("truetype"); }
+  @font-face{ font-family:"Jardotty";              src:url("fonts/Jardotty.ttf") format("truetype"); }
+  @font-face{ font-family:"Jarman";                src:url("fonts/Jarman.ttf") format("truetype"); }
+  @font-face{ font-family:"Cursive Standard";      src:url("fonts/CursiveStandard.ttf") format("truetype"); font-weight:400; }
+  @font-face{ font-family:"Cursive Standard";      src:url("fonts/CursiveStandardBold.ttf") format("truetype"); font-weight:700; }
+
+  /* ---- word content fonts (togglable) ---- */
+  .wcard .w,.grouphead .g,.gcard .head .g,.gcard .words{
+    font-family:"Century Gothic","Trebuchet MS",Arial,sans-serif;  /* print / manuscript */
+  }
+  body.cursive .wcard .w,
+  body.cursive .grouphead .g,
+  body.cursive .gcard .head .g,
+  body.cursive .gcard .words{
+    font-family:"Segoe Script","Bradley Hand","Lucida Handwriting","Comic Sans MS",cursive;
+  }
+  body.cursive .gcard .words{ font-size:15px; line-height:1.95; }
+  body.cursive .grouphead .g,body.cursive .gcard .head .g{ font-size:30px; }
+
+  /* downloaded fonts tend to need a size bump vs. the print default */
+  body.font-kg-primary-dots .wcard .w,
+  body.font-kg-primary-dots-lined .wcard .w,
+  body.font-dotness .wcard .w,
+  body.font-dashness .wcard .w,
+  body.font-lms-spelling-bee .wcard .w,
+  body.font-jardotty .wcard .w,
+  body.font-jarman .wcard .w,
+  body.font-kg-primary-dots .gcard .words,
+  body.font-kg-primary-dots-lined .gcard .words,
+  body.font-dotness .gcard .words,
+  body.font-dashness .gcard .words,
+  body.font-lms-spelling-bee .gcard .words,
+  body.font-jardotty .gcard .words,
+  body.font-jarman .gcard .words,
+  body.font-cursive-standard .gcard .words{ font-size:16px; line-height:1.9; }
+  body.font-kg-primary-dots .grouphead .g, body.font-kg-primary-dots .gcard .head .g,
+  body.font-kg-primary-dots-lined .grouphead .g, body.font-kg-primary-dots-lined .gcard .head .g,
+  body.font-dotness .grouphead .g, body.font-dotness .gcard .head .g,
+  body.font-dashness .grouphead .g, body.font-dashness .gcard .head .g,
+  body.font-lms-spelling-bee .grouphead .g, body.font-lms-spelling-bee .gcard .head .g,
+  body.font-jardotty .grouphead .g, body.font-jardotty .gcard .head .g,
+  body.font-jarman .grouphead .g, body.font-jarman .gcard .head .g,
+  body.font-cursive-standard .grouphead .g, body.font-cursive-standard .gcard .head .g{ font-size:32px; }
+
+  body.font-kg-primary-dots .wcard .w,.wcard .w{ }
+  body.font-kg-primary-dots .wcard .w{ font-family:"KG Primary Dots",cursive; }
+  body.font-kg-primary-dots .grouphead .g,body.font-kg-primary-dots .gcard .head .g,body.font-kg-primary-dots .gcard .words{ font-family:"KG Primary Dots",cursive; }
+
+  body.font-kg-primary-dots-lined .wcard .w{ font-family:"KG Primary Dots Lined",cursive; }
+  body.font-kg-primary-dots-lined .grouphead .g,body.font-kg-primary-dots-lined .gcard .head .g,body.font-kg-primary-dots-lined .gcard .words{ font-family:"KG Primary Dots Lined",cursive; }
+
+  body.font-dotness .wcard .w{ font-family:"DotNess",cursive; }
+  body.font-dotness .grouphead .g,body.font-dotness .gcard .head .g,body.font-dotness .gcard .words{ font-family:"DotNess",cursive; }
+
+  body.font-dashness .wcard .w{ font-family:"DashNess",cursive; }
+  body.font-dashness .grouphead .g,body.font-dashness .gcard .head .g,body.font-dashness .gcard .words{ font-family:"DashNess",cursive; }
+
+  body.font-lms-spelling-bee .wcard .w{ font-family:"LMS Spelling Bee",cursive; }
+  body.font-lms-spelling-bee .grouphead .g,body.font-lms-spelling-bee .gcard .head .g,body.font-lms-spelling-bee .gcard .words{ font-family:"LMS Spelling Bee",cursive; }
+
+  body.font-jardotty .wcard .w{ font-family:"Jardotty",cursive; }
+  body.font-jardotty .grouphead .g,body.font-jardotty .gcard .head .g,body.font-jardotty .gcard .words{ font-family:"Jardotty",cursive; }
+
+  body.font-jarman .wcard .w{ font-family:"Jarman",cursive; }
+  body.font-jarman .grouphead .g,body.font-jarman .gcard .head .g,body.font-jarman .gcard .words{ font-family:"Jarman",cursive; }
+
+  body.font-cursive-standard .wcard .w{ font-family:"Cursive Standard",cursive; }
+  body.font-cursive-standard .grouphead .g,body.font-cursive-standard .gcard .head .g,body.font-cursive-standard .gcard .words{ font-family:"Cursive Standard",cursive; }
+
+  /* ---------- Toolbar (screen only) ---------- */
+  .toolbar{
+    position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid #d5d9df;
+    padding:12px 18px; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;
+    box-shadow:0 1px 6px rgba(0,0,0,.08);
+  }
+  .toolbar h1{ font-size:16px; margin:0 12px 0 0; align-self:center; }
+  .tb-group{ display:flex; flex-direction:column; gap:4px; font-size:12px; }
+  .tb-group b{ font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:#667; }
+  .tb-group label{ font-weight:400; margin-right:8px; white-space:nowrap; }
+  .folders-filter{ max-width:520px; flex-wrap:wrap; display:flex; gap:2px 10px; }
+  button.print{
+    margin-left:auto; background:var(--blue); color:#fff; border:0; border-radius:6px;
+    padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer;
+  }
+  button.print:hover{ filter:brightness(1.08); }
+  .hint{ font-size:12px; color:#667; padding:8px 18px 0; }
+
+  /* ---------- Print sheet ---------- */
+  .sheet{ background:#fff; margin:16px auto; padding:5mm; width:297mm; min-height:210mm;
+          box-shadow:0 2px 12px rgba(0,0,0,.12); }
+  .section-title{ font-size:15px; font-weight:700; color:var(--blue); margin:0 0 8px;
+                  border-bottom:2px solid var(--blue); padding-bottom:4px; }
+
+  /* group header inside word-card grid */
+  .grouphead{ grid-column:1/-1; display:flex; align-items:baseline; gap:10px;
+              margin:10px 0 2px; padding-bottom:2px; border-bottom:1px solid #e2e2e2; }
+  .grouphead .g{ font-size:20px; font-weight:800; color:var(--red); }
+  .grouphead .k{ font-size:11px; color:#889; text-transform:uppercase; letter-spacing:.5px; }
+
+  /* ---------- Word cards (cut grid) ---------- */
+  .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,var(--card-w));
+             border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
+  .wcard{ position:relative; width:var(--card-w); height:var(--card-h); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
+          display:flex; align-items:center; justify-content:center; padding:6px 4px;
+          break-inside:avoid; }
+  .wcard .w{ font-size:var(--word-fs); font-weight:700; letter-spacing:.5px; }
+  .wcard .tag{ position:absolute; top:6px; left:8px; font-size:12px; color:#c3c3c3; letter-spacing:.3px; }
+
+  /* ---------- Grapheme list cards ---------- */
+  .gcardgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:8mm; }
+  .gcard{ border:1.5px solid #444; border-radius:7px; padding:10px 12px 12px; break-inside:avoid; }
+  .gcard .head{ display:flex; align-items:baseline; gap:8px; border-bottom:1.5px solid #eee;
+                margin-bottom:6px; padding-bottom:5px; }
+  .gcard .head .g{ font-size:26px; font-weight:800; color:var(--red); line-height:1; }
+  .gcard .head .k{ font-size:11px; color:var(--blue); text-transform:uppercase; letter-spacing:.6px; }
+  .gcard .head .n{ margin-left:auto; font-size:10px; color:#aab; }
+  .gcard .words{ columns:2; column-gap:14px; font-size:13px; line-height:1.65; }
+  .gcard .words .w{ break-inside:avoid; }
+
+  /* the highlighted grapheme */
+  .sound{ color:var(--red); }
+
+  /* ---------- Font weight override ---------- */
+  body.fw-normal .wcard .w,
+  body.fw-normal .grouphead .g,
+  body.fw-normal .gcard .head .g,
+  body.fw-normal .gcard .words{ font-weight:400 !important; }
+  body.fw-bold .wcard .w,
+  body.fw-bold .grouphead .g,
+  body.fw-bold .gcard .head .g,
+  body.fw-bold .gcard .words{ font-weight:700 !important; }
+
+  /* ---------- Fake italic (synthetic oblique) ---------- */
+  body.fake-italic .wcard .w,
+  body.fake-italic .grouphead .g,
+  body.fake-italic .gcard .head .g,
+  body.fake-italic .gcard .words{ font-style:italic !important; }
+
+  /* ---------- Black & white mode ---------- */
+  body.bw .sound{ color:#000; font-weight:800; text-decoration:underline; text-underline-offset:2px; }
+  body.bw .grouphead .g, body.bw .gcard .head .g{ color:#000; }
+  body.bw .gcard .head .k{ color:#000; }
+  body.bw .section-title{ color:#000; border-color:#000; }
+
+  .hidden{ display:none !important; }
+
+  @page{ size:A4 landscape; margin:5mm; }
+  @media print{
+    body{ background:#fff; }
+    .toolbar,.hint{ display:none !important; }
+    .sheet{ margin:0; padding:0; width:auto; min-height:0; box-shadow:none; }
+    .sheet + .sheet{ break-before:page; }
+  }
+</style>
+</head>
+<body>
+
+<div class="toolbar">
+  <h1>Reading Folders</h1>
+  <div class="tb-group">
+    <b>View</b>
+    <div>
+      <label><input type="radio" name="view" value="both" checked> Cả hai</label>
+      <label><input type="radio" name="view" value="words"> Thẻ từ</label>
+      <label><input type="radio" name="view" value="graphemes"> Thẻ grapheme</label>
+    </div>
+  </div>
+  <div class="tb-group">
+    <b>Kích thước thẻ (cm)</b>
+    <div style="display:flex;gap:8px;">
+      <label>Ngang <input type="number" id="cardWInput" value="10" min="3" max="21" step="0.5" style="width:56px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+      <label>Dọc <input type="number" id="cardHInput" value="7" min="2" max="21" step="0.5" style="width:56px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+    </div>
+  </div>
+  <div class="tb-group">
+    <b>Font</b>
+    <select id="fontSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
+      <option value="print">Chữ in (print)</option>
+      <option value="cursive">Chữ viết (system cursive)</option>
+      <option value="jarman">Jarman</option>
+      <option value="jardotty">Jardotty (dotted)</option>
+      <option value="lms-spelling-bee">LMS Spelling Bee (dotted)</option>
+      <option value="kg-primary-dots">KG Primary Dots</option>
+      <option value="kg-primary-dots-lined">KG Primary Dots Lined</option>
+      <option value="dotness">DotNess</option>
+      <option value="dashness">DashNess</option>
+      <option value="cursive-standard">Cursive Standard</option>
+    </select>
+  </div>
+  <div class="tb-group">
+    <b>Cỡ chữ</b>
+    <select id="fontSizeSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
+      <option value="auto">Tự động (theo font)</option>
+      <option value="28">28px</option>
+      <option value="32">32px</option>
+      <option value="36">36px</option>
+      <option value="40">40px</option>
+      <option value="44">44px</option>
+      <option value="48">48px</option>
+      <option value="52">52px</option>
+      <option value="56">56px</option>
+      <option value="60">60px</option>
+      <option value="64">64px</option>
+    </select>
+  </div>
+  <div class="tb-group">
+    <b>Độ đậm</b>
+    <select id="weightSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
+      <option value="auto">Mặc định</option>
+      <option value="normal">Normal (400)</option>
+      <option value="bold">Bold (700)</option>
+    </select>
+  </div>
+  <div class="tb-group">
+    <b>Kiểu</b>
+    <label><input type="checkbox" id="italicChk"> Nghiêng (italic giả)</label>
+  </div>
+  <div class="tb-group">
+    <b>Màu</b>
+    <div>
+      <label><input type="radio" name="color" value="red" checked> Đỏ (Montessori)</label>
+      <label><input type="radio" name="color" value="bw"> Đen trắng</label>
+    </div>
+  </div>
+  <div class="tb-group">
+    <b>Folders</b>
+    <div class="folders-filter" id="folderFilter"></div>
+  </div>
+  <button class="print" onclick="window.print()">🖨️ In / Lưu PDF</button>
+</div>
+<div class="hint">Mẹo in PDF: nhấn nút trên (hoặc Ctrl/Cmd+P) → chọn <b>Save as PDF</b> → khổ <b>A4</b> → bật <b>Background graphics</b> để giữ màu đỏ và viền cắt.</div>
+
+<div id="app"></div>
+
+<script>
+const DATA = {"title": "Reading Folders", "source": "Reading Folders words.pdf (Montessori phonics material)", "markerConvention": {"syntax": "Target grapheme(s) wrapped in square brackets inside each word string.", "examples": {"b[ai]t": "b + <span class='sound'>ai</span> + t", "c[a]k[e]": "split digraph a-e -> highlight both 'a' and 'e'"}, "html": "Split each word on /\\[([^\\]]+)\\]/; wrap captured groups in <span class=\"sound\"> (red). Strip brackets to get the plain word."}, "legend": {"green": "key letter written on the folder cover", "red": "sound written on cards and word booklets", "blue": "key sound written on the back of each card"}, "notes": ["Folders/graphemes follow the sound-family list in the PDF (ai, ee, ie, oa, ue, or, er, ou, oy, s, j, f, e, shun).", "Only words whose card grapheme is actually present are included, so every marker is valid. PDF words mis-filed under the wrong grapheme were dropped.", "Words are lowercased and de-duplicated per card.", "Several folders/cards are empty because the PDF listed no (usable) words for them (oa, or/au, er, ou, oy, cy, plain s, plain j, f, e, shun)."], "folders": [{"keySound": "ai", "graphemes": ["ai", "ay", "ei", "a-e"], "cards": [{"grapheme": "ai", "words": ["b[ai]t", "r[ai]l", "g[ai]n", "[ai]m", "h[ai]r", "j[ai]l", "m[ai]l", "p[ai]n", "r[ai]n", "r[ai]lway", "s[ai]l", "t[ai]l", "w[ai]t", "m[ai]d", "f[ai]r", "m[ai]n", "br[ai]n", "ch[ai]n", "f[ai]l", "tr[ai]n", "[ai]d", "st[ai]rway"]}, {"grapheme": "ay", "words": ["st[ay]", "ess[ay]", "sw[ay]", "subw[ay]", "pl[ay]", "mond[ay]", "cl[ay]", "gatew[ay]", "pr[ay]", "midw[ay]", "sl[ay]", "runw[ay]", "tr[ay]", "stairw[ay]", "d[ay]", "railw[ay]", "w[ay]", "overst[ay]", "b[ay]", "s[ay]", "fr[ay]", "m[ay]", "p[ay]", "l[ay]", "r[ay]", "str[ay]", "displ[ay]", "arr[ay]"]}, {"grapheme": "ei", "words": ["v[ei]n", "b[ei]ge", "r[ei]n", "r[ei]ndeer", "surv[ei]llance", "v[ei]l", "s[ei]smic", "f[ei]gned", "d[ei]ty", "f[ei]stiness"]}, {"grapheme": "a-e", "words": ["w[a]v[e]", "p[a]l[e]", "c[a]k[e]", "s[a]l[e]", "v[a]s[e]", "bl[a]z[e]", "ch[a]s[e]", "fl[a]k[e]", "br[a]v[e]", "br[a]k[e]", "s[a]f[e]", "d[a]t[e]", "pl[a]n[e]", "fr[a]m[e]", "gr[a]v[e]", "sn[a]k[e]", "sk[a]t[e]", "r[a]k[e]", "sp[a]r[e]", "cr[a]t[e]", "fl[a]m[e]", "r[a]t[e]", "st[a]l[e]", "sc[a]l[e]", "st[a]t[e]", "sl[a]t[e]", "t[a]m[e]", "c[a]n[e]", "sp[a]c[e]"]}]}, {"keySound": "ee", "graphemes": ["ee", "ea", "y", "ie", "e-e"], "cards": [{"grapheme": "ee", "words": ["s[ee]", "tr[ee]", "fr[ee]", "b[ee]", "f[ee]d", "n[ee]d", "s[ee]d", "m[ee]t", "f[ee]t", "sl[ee]p", "sw[ee]p", "sh[ee]p", "d[ee]p", "k[ee]p", "cr[ee]p", "st[ee]p", "gr[ee]n", "thr[ee]", "sp[ee]d", "sw[ee]t", "gr[ee]t", "str[ee]t", "b[ee]t", "fl[ee]t", "wh[ee]l", "st[ee]l", "p[ee]l", "sp[ee]ch", "scr[ee]n", "l[ee]k", "r[ee]f", "w[ee]k", "qu[ee]n", "refer[ee]", "eight[ee]n"]}, {"grapheme": "ea", "words": ["s[ea]", "sn[ea]k", "t[ea]", "b[ea]d", "r[ea]d", "l[ea]d", "s[ea]t", "m[ea]t", "b[ea]t", "h[ea]t", "n[ea]t", "p[ea]ch", "r[ea]ch", "t[ea]ch", "b[ea]ch", "cl[ea]n", "dr[ea]m", "d[ea]l", "h[ea]l", "m[ea]l", "r[ea]l", "sp[ea]k", "st[ea]m", "str[ea]m", "scr[ea]m", "l[ea]k", "w[ea]k", "pl[ea]d", "l[ea]f", "l[ea]st", "p[ea]ce", "[ea]se", "st[ea]l", "tr[ea]t", "ch[ea]t", "bl[ea]k", "gl[ea]m", "h[ea]ve", "w[ea]ve", "cr[ea]m", "s[ea]l"]}, {"grapheme": "y", "words": ["happ[y]", "bab[y]", "cand[y]", "funn[y]", "pupp[y]", "lad[y]", "jell[y]", "sill[y]", "cit[y]", "tin[y]", "penn[y]", "bus[y]", "bell[y]", "bod[y]", "luck[y]", "part[y]", "prett[y]", "stick[y]", "eas[y]", "berr[y]", "read[y]", "stud[y]", "dais[y]", "stor[y]", "sorr[y]", "tumm[y]", "fanc[y]", "glor[y]", "earl[y]", "momm[y]", "dadd[y]", "kitt[y]", "coz[y]", "shin[y]", "scar[y]", "nann[y]", "eight[y]"]}, {"grapheme": "ie", "words": ["p[ie]ce", "ch[ie]f", "th[ie]f", "br[ie]f", "f[ie]ld", "sh[ie]ld", "gr[ie]f", "bel[ie]f", "rel[ie]f", "y[ie]ld", "pr[ie]st", "s[ie]ge", "f[ie]nd", "n[ie]ce", "shr[ie]k", "pr[ie]sthood", "hyg[ie]ne", "retr[ie]ve", "ach[ie]ve", "rel[ie]ve", "misbel[ie]f", "d[ie]sel", "repr[ie]ve"]}, {"grapheme": "e-e", "words": ["sc[e]n[e]", "th[e]m[e]", "extr[e]m[e]", "del[e]t[e]", "comp[e]t[e]", "compl[e]t[e]", "concr[e]t[e]", "g[e]n[e]", "obsc[e]n[e]", "rec[e]d[e]", "athl[e]t[e]", "discr[e]t[e]"]}]}, {"keySound": "ie", "graphemes": ["ie", "igh", "y", "i-e"], "cards": [{"grapheme": "ie", "words": ["cr[ie]d", "t[ie]d", "fr[ie]d", "tr[ie]d", "sp[ie]d", "d[ie]d", "l[ie]d", "fl[ie]s", "fr[ie]s", "cr[ie]s", "dr[ie]d", "pr[ie]d", "appl[ie]d", "occup[ie]d", "suppl[ie]d", "den[ie]d", "env[ie]d", "repl[ie]d", "unt[ie]d", "outcr[ie]d", "def[ie]d", "dignif[ie]d", "qualif[ie]d", "simplif[ie]d", "verif[ie]d", "amplif[ie]d", "glorif[ie]d", "intensif[ie]d", "mortif[ie]d", "satisf[ie]d", "specif[ie]d", "terrif[ie]d", "unif[ie]d", "vilif[ie]d"]}, {"grapheme": "igh", "words": ["br[igh]t", "l[igh]t", "n[igh]t", "s[igh]", "s[igh]t", "t[igh]t", "fl[igh]t", "fr[igh]t", "sl[igh]t", "he[igh]t", "m[igh]t", "pl[igh]t", "r[igh]t", "al[igh]t", "del[igh]t", "ins[igh]t", "br[igh]ten", "enl[igh]ten", "fortn[igh]t", "h[igh]l[igh]t", "overfl[igh]t", "moonl[igh]t", "kn[igh]t", "fre[igh]t", "n[igh]ttime", "s[igh]tseeing", "midn[igh]t", "outr[igh]t", "sunl[igh]t", "t[igh]ten", "upt[igh]t", "dayl[igh]t", "copyr[igh]t"]}, {"grapheme": "y", "words": ["appl[y]", "den[y]", "suppl[y]", "repl[y]", "def[y]", "identif[y]", "modif[y]", "clarif[y]", "multipl[y]", "satisf[y]", "verif[y]", "simplif[y]", "terrif[y]", "glorif[y]", "amplif[y]", "specif[y]", "mystif[y]", "intensif[y]", "testif[y]", "justif[y]", "pacif[y]", "beautif[y]", "diversif[y]", "electrif[y]", "exemplif[y]", "nullif[y]", "objectif[y]", "personif[y]", "rectif[y]", "sanctif[y]", "solidif[y]", "vilif[y]", "fortif[y]", "crucif[y]"]}, {"grapheme": "i-e", "words": ["ab[i]d[e]", "ar[i]s[e]", "as[i]d[e]", "br[i]d[e]", "ch[i]d[e]", "cr[i]m[e]", "dec[i]d[e]", "def[i]n[e]", "descr[i]b[e]", "depr[i]v[e]", "dev[i]s[e]", "dr[i]v[e]", "ent[i]c[e]", "ent[i]r[e]", "exc[i]t[e]", "gl[i]d[e]", "h[i]d[e]", "inv[i]t[e]", "imb[i]b[e]", "kn[i]f[e]", "l[i]m[e]", "l[i]th[e]", "m[i]c[e]", "n[i]c[e]", "outs[i]d[e]", "prov[i]d[e]", "r[i]f[e]", "r[i]d[e]", "s[i]d[e]", "sl[i]d[e]", "sm[i]t[e]", "sp[i]n[e]", "str[i]v[e]", "surpr[i]s[e]", "thr[i]v[e]", "t[i]d[e]", "t[i]m[e]", "w[i]d[e]"]}]}, {"keySound": "oa", "graphemes": ["oa", "ow", "oe", "o-e"], "cards": [{"grapheme": "oa", "words": []}, {"grapheme": "ow", "words": []}, {"grapheme": "oe", "words": []}, {"grapheme": "o-e", "words": []}]}, {"keySound": "ue", "graphemes": ["ue", "oo", "ew", "u-e"], "cards": [{"grapheme": "ue", "words": ["bl[ue]", "tr[ue]", "val[ue]", "cl[ue]", "resc[ue]", "arg[ue]", "d[ue]", "s[ue]", "tiss[ue]", "aven[ue]"]}, {"grapheme": "oo", "words": ["m[oo]n", "f[oo]d", "m[oo]d", "br[oo]m", "n[oo]n", "sh[oo]t", "s[oo]n", "t[oo]th", "c[oo]l", "ch[oo]se"]}, {"grapheme": "ew", "words": ["bl[ew]", "ch[ew]", "d[ew]", "n[ew]", "fl[ew]", "dr[ew]", "gr[ew]", "shr[ew]d"]}, {"grapheme": "u-e", "words": ["r[u]l[e]", "c[u]b[e]", "[u]s[e]", "c[u]t[e]", "m[u]l[e]", "f[u]m[e]", "h[u]g[e]", "m[u]t[e]", "t[u]b[e]", "t[u]n[e]", "j[u]n[e]"]}]}, {"keySound": "or", "graphemes": ["or", "au", "ough", "aw"], "cards": [{"grapheme": "or", "words": ["f[or]"]}, {"grapheme": "au", "words": []}, {"grapheme": "ough", "words": ["b[ough]t", "f[ough]t", "[ough]t", "th[ough]t", "s[ough]t"]}, {"grapheme": "aw", "words": ["[aw]l"]}]}, {"keySound": "er", "graphemes": ["er", "ir", "ur"], "cards": [{"grapheme": "er", "words": []}, {"grapheme": "ir", "words": []}, {"grapheme": "ur", "words": []}]}, {"keySound": "ou", "graphemes": ["ou", "ow"], "cards": [{"grapheme": "ou", "words": []}, {"grapheme": "ow", "words": []}]}, {"keySound": "oy", "graphemes": ["oy", "oi"], "cards": [{"grapheme": "oy", "words": []}, {"grapheme": "oi", "words": []}]}, {"keySound": "s", "graphemes": ["ce", "ci", "cy", "s"], "cards": [{"grapheme": "ce", "words": ["spi[ce]", "twi[ce]", "voi[ce]", "sli[ce]", "senten[ce]", "ra[ce]", "pla[ce]", "pri[ce]", "prin[ce]", "fen[ce]", "fa[ce]", "dan[ce]", "surveillan[ce]"]}, {"grapheme": "ci", "words": ["medi[ci]ne", "pen[ci]l", "re[ci]pe", "[ci]ty", "de[ci]de", "ex[ci]ted", "[ci]der", "[ci]rcle", "[ci]rcus", "ran[ci]d", "[ci]rcumstance", "pa[ci]fic"]}, {"grapheme": "cy", "words": []}, {"grapheme": "s", "words": []}]}, {"keySound": "j", "graphemes": ["ge", "gi", "j"], "cards": [{"grapheme": "ge", "words": ["rid[ge]", "ca[ge]", "nud[ge]", "[ge]nerate", "pled[ge]", "grud[ge]", "lod[ge]", "dod[ge]", "wa[ge]", "[ge]ntle", "a[ge]nt", "bud[ge]t", "an[ge]l", "dan[ge]r", "emer[ge]ncy", "[ge]rm", "[ge]l", "le[ge]nd", "in[ge]st", "[ge]m", "ur[ge]nt", "a[ge]", "enga[ge]", "hu[ge]", "brid[ge]", "fled[ge]", "cartrid[ge]", "knowled[ge]", "bil[ge]", "crin[ge]", "plun[ge]", "dislod[ge]", "challen[ge]", "frin[ge]", "sled[ge]", "oran[ge]", "smud[ge]", "sin[ge]", "for[ge]", "hin[ge]", "dischar[ge]", "emer[ge]", "enlar[ge]", "ur[ge]", "gor[ge]", "lar[ge]", "bei[ge]"]}, {"grapheme": "gi", "words": ["a[gi]le", "aller[gi]c", "apolo[gi]se", "di[gi]t", "[gi]st", "eli[gi]ble", "[gi]raffe", "en[gi]ne", "en[gi]neer", "fra[gi]le", "[gi]nseng", "fu[gi]tive", "[gi]ant", "mar[gi]n", "[gi]gantic", "ima[gi]nation", "[gi]ngerly", "le[gi]on", "le[gi]slature", "lo[gi]c", "hy[gi]ene", "ille[gi]ble", "ori[gi]nal", "pla[gi]arize", "reli[gi]on", "strate[gi]c", "lon[gi]tude", "vi[gi]lant", "vi[gi]lante", "sur[gi]cal", "tra[gi]c", "re[gi]on"]}, {"grapheme": "j", "words": []}]}, {"keySound": "f", "graphemes": ["f", "ph"], "cards": [{"grapheme": "f", "words": []}, {"grapheme": "ph", "words": []}]}, {"keySound": "e", "graphemes": ["e", "ea"], "cards": [{"grapheme": "e", "words": []}, {"grapheme": "ea", "words": []}]}, {"keySound": "shun", "graphemes": ["tion", "sion"], "cards": [{"grapheme": "tion", "words": []}, {"grapheme": "sion", "words": []}]}]};
+
+// "b[ai]t" -> "b<span class='sound'>ai</span>t"
+function renderWord(w){
+  return w.split(/\[([^\]]+)\]/).map((seg,i)=> i%2 ? '<span class="sound">'+seg+'</span>' : seg).join('');
+}
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+const app = document.getElementById('app');
+const filterBox = document.getElementById('folderFilter');
+
+// build folder filter checkboxes (only folders that have any words)
+const nonEmpty = DATA.folders.filter(f => f.cards.some(c=>c.words.length));
+nonEmpty.forEach(f=>{
+  const id='f_'+f.keySound;
+  const lbl=document.createElement('label');
+  lbl.innerHTML='<input type="checkbox" value="'+f.keySound+'" checked> '+f.keySound;
+  filterBox.appendChild(lbl);
+});
+
+function selectedFolders(){
+  return [...filterBox.querySelectorAll('input:checked')].map(i=>i.value);
+}
+function currentView(){ return document.querySelector('input[name=view]:checked').value; }
+
+function render(){
+  const sel = new Set(selectedFolders());
+  const view = currentView();
+  const folders = DATA.folders.filter(f=> sel.has(f.keySound) && f.cards.some(c=>c.words.length));
+  let out='';
+
+  // ---- Section 1: word cards ----
+  if(view==='both' || view==='words'){
+    out += '<div class="sheet"><div class="section-title">Thẻ từ (cắt rời) — Word cards</div><div class="wordgrid">';
+    folders.forEach(f=>{
+      f.cards.filter(c=>c.words.length).forEach(c=>{
+        out += '<div class="grouphead"><span class="g">'+esc(c.grapheme)+'</span>'
+             + '<span class="k">folder: '+esc(f.keySound)+'</span></div>';
+        c.words.forEach(w=>{
+          out += '<div class="wcard"><span class="tag">'+esc(c.grapheme)+'</span>'
+               + '<span class="w">'+renderWord(esc(w))+'</span></div>';
+        });
+      });
+    });
+    out += '</div></div>';
+  }
+
+  // ---- Section 2: grapheme list cards ----
+  if(view==='both' || view==='graphemes'){
+    out += '<div class="sheet"><div class="section-title">Thẻ theo grapheme — Grapheme cards</div><div class="gcardgrid">';
+    folders.forEach(f=>{
+      f.cards.filter(c=>c.words.length).forEach(c=>{
+        out += '<div class="gcard"><div class="head"><span class="g">'+esc(c.grapheme)+'</span>'
+             + '<span class="k">folder '+esc(f.keySound)+'</span>'
+             + '<span class="n">'+c.words.length+' words</span></div><div class="words">';
+        c.words.forEach(w=>{ out += '<div class="w">'+renderWord(esc(w))+'</div>'; });
+        out += '</div></div>';
+      });
+    });
+    out += '</div></div>';
+  }
+
+  app.innerHTML = out;
+}
+
+filterBox.addEventListener('change', render);
+document.querySelectorAll('input[name=view]').forEach(r=>r.addEventListener('change', render));
+document.querySelectorAll('input[name=color]').forEach(r=>r.addEventListener('change', e=>{
+  document.body.classList.toggle('bw', e.target.value==='bw');
+}));
+
+// font toggle, also settable via ?font=xxx for headless export
+const fontSel = document.getElementById('fontSel');
+const FONT_CLASSES = ['cursive','font-jarman','font-jardotty','font-lms-spelling-bee',
+  'font-kg-primary-dots','font-kg-primary-dots-lined','font-dotness','font-dashness','font-cursive-standard'];
+function applyFont(v){
+  document.body.classList.remove(...FONT_CLASSES);
+  if(v && v!=='print') document.body.classList.add(v==='cursive' ? 'cursive' : 'font-'+v);
+}
+fontSel.addEventListener('change', e=>{ applyFont(e.target.value); applyFontSize(); });
+const _f = new URLSearchParams(location.search).get('font');
+if(_f){ fontSel.value = _f; applyFont(_f); }
+
+// card width/height (cm), also settable via ?cardw=&cardh=
+const cardWInput = document.getElementById('cardWInput');
+const cardHInput = document.getElementById('cardHInput');
+function applyCardSize(){
+  const w = parseFloat(cardWInput.value) || 10;
+  const h = parseFloat(cardHInput.value) || 7;
+  document.documentElement.style.setProperty('--card-w', w+'cm');
+  document.documentElement.style.setProperty('--card-h', h+'cm');
+}
+cardWInput.addEventListener('input', applyCardSize);
+cardHInput.addEventListener('input', applyCardSize);
+const _cw = new URLSearchParams(location.search).get('cardw');
+const _ch = new URLSearchParams(location.search).get('cardh');
+if(_cw) cardWInput.value = _cw;
+if(_ch) cardHInput.value = _ch;
+applyCardSize();
+
+// word font size (px), "auto" follows each font's built-in default; also settable via ?fontsize=xxx
+const fontSizeSel = document.getElementById('fontSizeSel');
+const DEFAULT_FS = { print:42, cursive:48, jarman:50, jardotty:50, 'lms-spelling-bee':50,
+  'kg-primary-dots':50, 'kg-primary-dots-lined':50, dotness:50, dashness:50, 'cursive-standard':50 };
+function applyFontSize(){
+  const v = fontSizeSel.value;
+  const px = v==='auto' ? (DEFAULT_FS[fontSel.value] || 42) : parseInt(v,10);
+  document.documentElement.style.setProperty('--word-fs', px+'px');
+}
+fontSizeSel.addEventListener('change', applyFontSize);
+const _fs = new URLSearchParams(location.search).get('fontsize');
+if(_fs) fontSizeSel.value = _fs;
+applyFontSize();
+
+// font-weight override, also settable via ?weight=xxx
+const weightSel = document.getElementById('weightSel');
+function applyWeight(v){
+  document.body.classList.remove('fw-normal','fw-bold');
+  if(v==='normal') document.body.classList.add('fw-normal');
+  if(v==='bold') document.body.classList.add('fw-bold');
+}
+weightSel.addEventListener('change', e=>applyWeight(e.target.value));
+const _w = new URLSearchParams(location.search).get('weight');
+if(_w){ weightSel.value = _w; applyWeight(_w); }
+
+// fake italic toggle, also settable via ?italic=1
+const italicChk = document.getElementById('italicChk');
+italicChk.addEventListener('change', e=>{
+  document.body.classList.toggle('fake-italic', e.target.checked);
+});
+if(new URLSearchParams(location.search).get('italic')==='1'){ italicChk.checked = true; document.body.classList.add('fake-italic'); }
+
+render();
+</script>
+</body>
+</html>

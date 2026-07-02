@@ -1,11 +1,12 @@
 # -*- coding: utf-8 -*-
-# Build reading-folders.html from reading-folders-data.json (data embedded inline).
+# Build reading-folders.html (+ index.html for GitHub Pages) from reading-folders-data.json.
 # Run:  python gen_html.py
 import json, io, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
 SRC = os.path.join(HERE, "reading-folders-data.json")
 OUT = os.path.join(HERE, "reading-folders.html")
+OUT_INDEX = os.path.join(HERE, "index.html")
 
 data = json.load(io.open(SRC, encoding="utf-8"))
 data_js = json.dumps(data, ensure_ascii=False)
@@ -410,4 +411,5 @@ render();
 
 html = html.replace("__DATA__", data_js)
 io.open(OUT, "w", encoding="utf-8").write(html)
-print("Wrote", OUT, "-", len(html), "bytes")
+io.open(OUT_INDEX, "w", encoding="utf-8").write(html)
+print("Wrote", OUT, "and", OUT_INDEX, "-", len(html), "bytes each")
