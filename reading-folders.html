@@ -36,7 +36,7 @@
   body.cursive .gcard .words{
     font-family:"Segoe Script","Bradley Hand","Lucida Handwriting","Comic Sans MS",cursive;
   }
-  body.cursive .wcard .w{ font-size:27px; }
+  body.cursive .wcard .w{ font-size:48px; }
   body.cursive .gcard .words{ font-size:15px; line-height:1.95; }
   body.cursive .grouphead .g,body.cursive .gcard .head .g{ font-size:30px; }
 
@@ -48,7 +48,7 @@
   body.font-lms-spelling-bee .wcard .w,
   body.font-jardotty .wcard .w,
   body.font-jarman .wcard .w,
-  body.font-cursive-standard .wcard .w{ font-size:28px; }
+  body.font-cursive-standard .wcard .w{ font-size:50px; }
   body.font-kg-primary-dots .gcard .words,
   body.font-kg-primary-dots-lined .gcard .words,
   body.font-dotness .gcard .words,
@@ -110,7 +110,7 @@
   .hint{ font-size:12px; color:#667; padding:8px 18px 0; }
 
   /* ---------- Print sheet ---------- */
-  .sheet{ background:#fff; margin:16px auto; padding:12mm; width:210mm; min-height:297mm;
+  .sheet{ background:#fff; margin:16px auto; padding:12mm; width:297mm; min-height:210mm;
           box-shadow:0 2px 12px rgba(0,0,0,.12); }
   .section-title{ font-size:15px; font-weight:700; color:var(--blue); margin:0 0 8px;
                   border-bottom:2px solid var(--blue); padding-bottom:4px; }
@@ -122,13 +122,13 @@
   .grouphead .k{ font-size:11px; color:#889; text-transform:uppercase; letter-spacing:.5px; }
 
   /* ---------- Word cards (cut grid) ---------- */
-  .wordgrid{ display:grid; grid-template-columns:repeat(3,1fr);
+  .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,10cm);
              border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
-  .wcard{ position:relative; border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
-          min-height:2.3cm; display:flex; align-items:center; justify-content:center; padding:6px 4px;
+  .wcard{ position:relative; width:10cm; height:7cm; border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
+          display:flex; align-items:center; justify-content:center; padding:6px 4px;
           break-inside:avoid; }
-  .wcard .w{ font-size:23px; font-weight:700; letter-spacing:.5px; }
-  .wcard .tag{ position:absolute; top:3px; left:5px; font-size:9px; color:#c3c3c3; letter-spacing:.3px; }
+  .wcard .w{ font-size:42px; font-weight:700; letter-spacing:.5px; }
+  .wcard .tag{ position:absolute; top:6px; left:8px; font-size:12px; color:#c3c3c3; letter-spacing:.3px; }
 
   /* ---------- Grapheme list cards ---------- */
   .gcardgrid{ display:grid; grid-template-columns:repeat(2,1fr); gap:8mm; }
@@ -168,7 +168,7 @@
 
   .hidden{ display:none !important; }
 
-  @page{ size:A4; margin:12mm; }
+  @page{ size:A4 landscape; margin:12mm; }
   @media print{
     body{ background:#fff; }
     .toolbar,.hint{ display:none !important; }
