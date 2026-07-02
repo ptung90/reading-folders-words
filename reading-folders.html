@@ -10,6 +10,9 @@
     --blue:#1565c0;
     --ink:#1a1a1a;
     --cut:#b0b0b0;
+    --card-w:10cm;
+    --card-h:7cm;
+    --word-fs:42px;
   }
   *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   html,body{ margin:0; padding:0; }
@@ -36,7 +39,6 @@
   body.cursive .gcard .words{
     font-family:"Segoe Script","Bradley Hand","Lucida Handwriting","Comic Sans MS",cursive;
   }
-  body.cursive .wcard .w{ font-size:48px; }
   body.cursive .gcard .words{ font-size:15px; line-height:1.95; }
   body.cursive .grouphead .g,body.cursive .gcard .head .g{ font-size:30px; }
 
@@ -48,7 +50,6 @@
   body.font-lms-spelling-bee .wcard .w,
   body.font-jardotty .wcard .w,
   body.font-jarman .wcard .w,
-  body.font-cursive-standard .wcard .w{ font-size:50px; }
   body.font-kg-primary-dots .gcard .words,
   body.font-kg-primary-dots-lined .gcard .words,
   body.font-dotness .gcard .words,
@@ -110,7 +111,7 @@
   .hint{ font-size:12px; color:#667; padding:8px 18px 0; }
 
   /* ---------- Print sheet ---------- */
-  .sheet{ background:#fff; margin:16px auto; padding:12mm; width:297mm; min-height:210mm;
+  .sheet{ background:#fff; margin:16px auto; padding:5mm; width:297mm; min-height:210mm;
           box-shadow:0 2px 12px rgba(0,0,0,.12); }
   .section-title{ font-size:15px; font-weight:700; color:var(--blue); margin:0 0 8px;
                   border-bottom:2px solid var(--blue); padding-bottom:4px; }
@@ -122,12 +123,12 @@
   .grouphead .k{ font-size:11px; color:#889; text-transform:uppercase; letter-spacing:.5px; }
 
   /* ---------- Word cards (cut grid) ---------- */
-  .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,10cm);
+  .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,var(--card-w));
              border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
-  .wcard{ position:relative; width:10cm; height:7cm; border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
+  .wcard{ position:relative; width:var(--card-w); height:var(--card-h); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
           display:flex; align-items:center; justify-content:center; padding:6px 4px;
           break-inside:avoid; }
-  .wcard .w{ font-size:42px; font-weight:700; letter-spacing:.5px; }
+  .wcard .w{ font-size:var(--word-fs); font-weight:700; letter-spacing:.5px; }
   .wcard .tag{ position:absolute; top:6px; left:8px; font-size:12px; color:#c3c3c3; letter-spacing:.3px; }
 
   /* ---------- Grapheme list cards ---------- */
@@ -168,7 +169,7 @@
 
   .hidden{ display:none !important; }
 
-  @page{ size:A4 landscape; margin:12mm; }
+  @page{ size:A4 landscape; margin:5mm; }
   @media print{
     body{ background:#fff; }
     .toolbar,.hint{ display:none !important; }
@@ -190,6 +191,13 @@
     </div>
   </div>
   <div class="tb-group">
+    <b>Kích thước thẻ (cm)</b>
+    <div style="display:flex;gap:8px;">
+      <label>Ngang <input type="number" id="cardWInput" value="10" min="3" max="21" step="0.5" style="width:56px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+      <label>Dọc <input type="number" id="cardHInput" value="7" min="2" max="21" step="0.5" style="width:56px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+    </div>
+  </div>
+  <div class="tb-group">
     <b>Font</b>
     <select id="fontSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
       <option value="print">Chữ in (print)</option>
@@ -202,6 +210,22 @@
       <option value="dotness">DotNess</option>
       <option value="dashness">DashNess</option>
       <option value="cursive-standard">Cursive Standard</option>
+    </select>
+  </div>
+  <div class="tb-group">
+    <b>Cỡ chữ</b>
+    <select id="fontSizeSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
+      <option value="auto">Tự động (theo font)</option>
+      <option value="28">28px</option>
+      <option value="32">32px</option>
+      <option value="36">36px</option>
+      <option value="40">40px</option>
+      <option value="44">44px</option>
+      <option value="48">48px</option>
+      <option value="52">52px</option>
+      <option value="56">56px</option>
+      <option value="60">60px</option>
+      <option value="64">64px</option>
     </select>
   </div>
   <div class="tb-group">
@@ -313,9 +337,40 @@ function applyFont(v){
   document.body.classList.remove(...FONT_CLASSES);
   if(v && v!=='print') document.body.classList.add(v==='cursive' ? 'cursive' : 'font-'+v);
 }
-fontSel.addEventListener('change', e=>applyFont(e.target.value));
+fontSel.addEventListener('change', e=>{ applyFont(e.target.value); applyFontSize(); });
 const _f = new URLSearchParams(location.search).get('font');
 if(_f){ fontSel.value = _f; applyFont(_f); }
+
+// card width/height (cm), also settable via ?cardw=&cardh=
+const cardWInput = document.getElementById('cardWInput');
+const cardHInput = document.getElementById('cardHInput');
+function applyCardSize(){
+  const w = parseFloat(cardWInput.value) || 10;
+  const h = parseFloat(cardHInput.value) || 7;
+  document.documentElement.style.setProperty('--card-w', w+'cm');
+  document.documentElement.style.setProperty('--card-h', h+'cm');
+}
+cardWInput.addEventListener('input', applyCardSize);
+cardHInput.addEventListener('input', applyCardSize);
+const _cw = new URLSearchParams(location.search).get('cardw');
+const _ch = new URLSearchParams(location.search).get('cardh');
+if(_cw) cardWInput.value = _cw;
+if(_ch) cardHInput.value = _ch;
+applyCardSize();
+
+// word font size (px), "auto" follows each font's built-in default; also settable via ?fontsize=xxx
+const fontSizeSel = document.getElementById('fontSizeSel');
+const DEFAULT_FS = { print:42, cursive:48, jarman:50, jardotty:50, 'lms-spelling-bee':50,
+  'kg-primary-dots':50, 'kg-primary-dots-lined':50, dotness:50, dashness:50, 'cursive-standard':50 };
+function applyFontSize(){
+  const v = fontSizeSel.value;
+  const px = v==='auto' ? (DEFAULT_FS[fontSel.value] || 42) : parseInt(v,10);
+  document.documentElement.style.setProperty('--word-fs', px+'px');
+}
+fontSizeSel.addEventListener('change', applyFontSize);
+const _fs = new URLSearchParams(location.search).get('fontsize');
+if(_fs) fontSizeSel.value = _fs;
+applyFontSize();
 
 // font-weight override, also settable via ?weight=xxx
 const weightSel = document.getElementById('weightSel');
