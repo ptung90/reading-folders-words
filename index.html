@@ -13,6 +13,8 @@
     --card-w:10cm;
     --card-h:7cm;
     --word-fs:42px;
+    --page-w:297mm;
+    --page-h:210mm;
   }
   *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   html,body{ margin:0; padding:0; }
@@ -111,7 +113,7 @@
   .hint{ font-size:12px; color:#667; padding:8px 18px 0; }
 
   /* ---------- Print sheet ---------- */
-  .sheet{ background:#fff; margin:16px auto; padding:5mm; width:297mm; min-height:210mm;
+  .sheet{ background:#fff; margin:16px auto; padding:5mm; width:var(--page-w); min-height:var(--page-h);
           box-shadow:0 2px 12px rgba(0,0,0,.12); }
   .section-title{ font-size:15px; font-weight:700; color:var(--blue); margin:0 0 8px;
                   border-bottom:2px solid var(--blue); padding-bottom:4px; }
@@ -188,6 +190,13 @@
       <label><input type="radio" name="view" value="both" checked> Cả hai</label>
       <label><input type="radio" name="view" value="words"> Thẻ từ</label>
       <label><input type="radio" name="view" value="graphemes"> Thẻ grapheme</label>
+    </div>
+  </div>
+  <div class="tb-group">
+    <b>Khổ giấy</b>
+    <div>
+      <label><input type="radio" name="orientation" value="landscape" checked> Ngang</label>
+      <label><input type="radio" name="orientation" value="portrait"> Dọc</label>
     </div>
   </div>
   <div class="tb-group">
@@ -357,6 +366,21 @@ const _ch = new URLSearchParams(location.search).get('cardh');
 if(_cw) cardWInput.value = _cw;
 if(_ch) cardHInput.value = _ch;
 applyCardSize();
+
+// paper orientation, also settable via ?orientation=portrait|landscape
+const orientationRadios = document.querySelectorAll('input[name=orientation]');
+const pageStyleTag = document.createElement('style');
+document.head.appendChild(pageStyleTag);
+function applyOrientation(v){
+  const landscape = v !== 'portrait';
+  document.documentElement.style.setProperty('--page-w', landscape ? '297mm' : '210mm');
+  document.documentElement.style.setProperty('--page-h', landscape ? '210mm' : '297mm');
+  pageStyleTag.textContent = '@page{ size:A4 '+(landscape ? 'landscape' : 'portrait')+'; margin:5mm; }';
+}
+orientationRadios.forEach(r=>r.addEventListener('change', e=>applyOrientation(e.target.value)));
+const _o = new URLSearchParams(location.search).get('orientation');
+if(_o){ const match=[...orientationRadios].find(r=>r.value===_o); if(match) match.checked=true; }
+applyOrientation(document.querySelector('input[name=orientation]:checked').value);
 
 // word font size (px), "auto" follows each font's built-in default; also settable via ?fontsize=xxx
 const fontSizeSel = document.getElementById('fontSizeSel');
