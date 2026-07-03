@@ -75,7 +75,7 @@ html = r"""<!DOCTYPE html>
   .hint{ font-size:12px; color:#667; padding:8px 18px 0; }
 
   /* ---------- Print sheet ---------- */
-  .sheet{ background:#fff; margin:16px auto; padding:5mm; width:var(--page-w); min-height:var(--page-h);
+  .sheet{ background:#fff; margin:16px auto; padding:0; width:var(--page-w); min-height:var(--page-h);
           box-shadow:0 2px 12px rgba(0,0,0,.12); }
   .section-title{ font-size:15px; font-weight:700; color:var(--blue); margin:0 0 8px;
                   border-bottom:2px solid var(--blue); padding-bottom:4px; }
@@ -132,7 +132,7 @@ html = r"""<!DOCTYPE html>
 
   .hidden{ display:none !important; }
 
-  @page{ size:A4 landscape; margin:5mm; }
+  @page{ size:A4 landscape; margin:0; }
   @media print{
     body{ background:#fff; }
     .toolbar,.hint{ display:none !important; }
@@ -328,7 +328,7 @@ function applyOrientation(v){
   const landscape = v !== 'portrait';
   document.documentElement.style.setProperty('--page-w', landscape ? '297mm' : '210mm');
   document.documentElement.style.setProperty('--page-h', landscape ? '210mm' : '297mm');
-  pageStyleTag.textContent = '@page{ size:A4 '+(landscape ? 'landscape' : 'portrait')+'; margin:5mm; }';
+  pageStyleTag.textContent = '@page{ size:A4 '+(landscape ? 'landscape' : 'portrait')+'; margin:0; }';
 }
 orientationRadios.forEach(r=>r.addEventListener('change', e=>applyOrientation(e.target.value)));
 const _o = new URLSearchParams(location.search).get('orientation');
