@@ -23,7 +23,7 @@ html = r"""<!DOCTYPE html>
     --blue:#1565c0;
     --ink:#1a1a1a;
     --cut:#b0b0b0;
-    --cols:2;
+    --cols:3;
     --rows:3;
     --word-fs:42px;
     --page-w:297mm;
@@ -163,7 +163,7 @@ html = r"""<!DOCTYPE html>
   <div class="tb-group">
     <b>Lưới thẻ (cột × hàng)</b>
     <div style="display:flex;gap:8px;">
-      <label>Cột <input type="number" id="colsInput" value="2" min="1" max="10" step="1" style="width:52px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+      <label>Cột <input type="number" id="colsInput" value="3" min="1" max="10" step="1" style="width:52px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
       <label>Hàng <input type="number" id="rowsInput" value="3" min="1" max="10" step="1" style="width:52px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
     </div>
   </div>
@@ -307,7 +307,7 @@ applyFont(fontSel.value);
 const colsInput = document.getElementById('colsInput');
 const rowsInput = document.getElementById('rowsInput');
 function applyGrid(){
-  const cols = parseInt(colsInput.value, 10) || 2;
+  const cols = parseInt(colsInput.value, 10) || 3;
   const rows = parseInt(rowsInput.value, 10) || 3;
   document.documentElement.style.setProperty('--cols', cols);
   document.documentElement.style.setProperty('--rows', rows);
