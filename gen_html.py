@@ -33,16 +33,9 @@ html = r"""<!DOCTYPE html>
   html,body{ margin:0; padding:0; }
   body{ font-family:"Segoe UI",Arial,sans-serif; color:var(--ink); background:#eceef1; }
 
-  /* ---- downloaded preview fonts ---- */
-  @font-face{ font-family:"KG Primary Dots";       src:url("fonts/KGPrimaryDots.ttf") format("truetype"); }
-  @font-face{ font-family:"KG Primary Dots Lined"; src:url("fonts/KGPrimaryDotsLined.ttf") format("truetype"); }
-  @font-face{ font-family:"DotNess";               src:url("fonts/DotNess.ttf") format("truetype"); }
-  @font-face{ font-family:"DashNess";              src:url("fonts/DashNess.ttf") format("truetype"); }
-  @font-face{ font-family:"LMS Spelling Bee";      src:url("fonts/LMSSpellingBee.ttf") format("truetype"); }
-  @font-face{ font-family:"Jardotty";              src:url("fonts/Jardotty.ttf") format("truetype"); }
-  @font-face{ font-family:"Jarman";                src:url("fonts/Jarman.ttf") format("truetype"); }
-  @font-face{ font-family:"Cursive Standard";      src:url("fonts/CursiveStandard.ttf") format("truetype"); font-weight:400; }
-  @font-face{ font-family:"Cursive Standard";      src:url("fonts/CursiveStandardBold.ttf") format("truetype"); font-weight:700; }
+  /* ---- downloaded preview font ---- */
+  @font-face{ font-family:"Cursive Standard"; src:url("fonts/CursiveStandard.ttf") format("truetype"); font-weight:400; }
+  @font-face{ font-family:"Cursive Standard"; src:url("fonts/CursiveStandardBold.ttf") format("truetype"); font-weight:700; }
 
   /* ---- word content fonts (togglable) ---- */
   .wcard .w,.grouphead .g,.gcard .head .g,.gcard .words{
@@ -57,52 +50,8 @@ html = r"""<!DOCTYPE html>
   body.cursive .gcard .words{ font-size:15px; line-height:1.95; }
   body.cursive .grouphead .g,body.cursive .gcard .head .g{ font-size:30px; }
 
-  /* downloaded fonts tend to need a size bump vs. the print default */
-  body.font-kg-primary-dots .wcard .w,
-  body.font-kg-primary-dots-lined .wcard .w,
-  body.font-dotness .wcard .w,
-  body.font-dashness .wcard .w,
-  body.font-lms-spelling-bee .wcard .w,
-  body.font-jardotty .wcard .w,
-  body.font-jarman .wcard .w,
-  body.font-kg-primary-dots .gcard .words,
-  body.font-kg-primary-dots-lined .gcard .words,
-  body.font-dotness .gcard .words,
-  body.font-dashness .gcard .words,
-  body.font-lms-spelling-bee .gcard .words,
-  body.font-jardotty .gcard .words,
-  body.font-jarman .gcard .words,
   body.font-cursive-standard .gcard .words{ font-size:16px; line-height:1.9; }
-  body.font-kg-primary-dots .grouphead .g, body.font-kg-primary-dots .gcard .head .g,
-  body.font-kg-primary-dots-lined .grouphead .g, body.font-kg-primary-dots-lined .gcard .head .g,
-  body.font-dotness .grouphead .g, body.font-dotness .gcard .head .g,
-  body.font-dashness .grouphead .g, body.font-dashness .gcard .head .g,
-  body.font-lms-spelling-bee .grouphead .g, body.font-lms-spelling-bee .gcard .head .g,
-  body.font-jardotty .grouphead .g, body.font-jardotty .gcard .head .g,
-  body.font-jarman .grouphead .g, body.font-jarman .gcard .head .g,
   body.font-cursive-standard .grouphead .g, body.font-cursive-standard .gcard .head .g{ font-size:32px; }
-
-  body.font-kg-primary-dots .wcard .w,.wcard .w{ }
-  body.font-kg-primary-dots .wcard .w{ font-family:"KG Primary Dots",cursive; }
-  body.font-kg-primary-dots .grouphead .g,body.font-kg-primary-dots .gcard .head .g,body.font-kg-primary-dots .gcard .words{ font-family:"KG Primary Dots",cursive; }
-
-  body.font-kg-primary-dots-lined .wcard .w{ font-family:"KG Primary Dots Lined",cursive; }
-  body.font-kg-primary-dots-lined .grouphead .g,body.font-kg-primary-dots-lined .gcard .head .g,body.font-kg-primary-dots-lined .gcard .words{ font-family:"KG Primary Dots Lined",cursive; }
-
-  body.font-dotness .wcard .w{ font-family:"DotNess",cursive; }
-  body.font-dotness .grouphead .g,body.font-dotness .gcard .head .g,body.font-dotness .gcard .words{ font-family:"DotNess",cursive; }
-
-  body.font-dashness .wcard .w{ font-family:"DashNess",cursive; }
-  body.font-dashness .grouphead .g,body.font-dashness .gcard .head .g,body.font-dashness .gcard .words{ font-family:"DashNess",cursive; }
-
-  body.font-lms-spelling-bee .wcard .w{ font-family:"LMS Spelling Bee",cursive; }
-  body.font-lms-spelling-bee .grouphead .g,body.font-lms-spelling-bee .gcard .head .g,body.font-lms-spelling-bee .gcard .words{ font-family:"LMS Spelling Bee",cursive; }
-
-  body.font-jardotty .wcard .w{ font-family:"Jardotty",cursive; }
-  body.font-jardotty .grouphead .g,body.font-jardotty .gcard .head .g,body.font-jardotty .gcard .words{ font-family:"Jardotty",cursive; }
-
-  body.font-jarman .wcard .w{ font-family:"Jarman",cursive; }
-  body.font-jarman .grouphead .g,body.font-jarman .gcard .head .g,body.font-jarman .gcard .words{ font-family:"Jarman",cursive; }
 
   body.font-cursive-standard .wcard .w{ font-family:"Cursive Standard",cursive; }
   body.font-cursive-standard .grouphead .g,body.font-cursive-standard .gcard .head .g,body.font-cursive-standard .gcard .words{ font-family:"Cursive Standard",cursive; }
@@ -223,14 +172,7 @@ html = r"""<!DOCTYPE html>
     <select id="fontSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
       <option value="print">Chữ in (print)</option>
       <option value="cursive">Chữ viết (system cursive)</option>
-      <option value="jarman">Jarman</option>
-      <option value="jardotty">Jardotty (dotted)</option>
-      <option value="lms-spelling-bee">LMS Spelling Bee (dotted)</option>
-      <option value="kg-primary-dots">KG Primary Dots</option>
-      <option value="kg-primary-dots-lined">KG Primary Dots Lined</option>
-      <option value="dotness">DotNess</option>
-      <option value="dashness">DashNess</option>
-      <option value="cursive-standard">Cursive Standard</option>
+      <option value="cursive-standard" selected>Cursive Standard</option>
     </select>
   </div>
   <div class="tb-group">
@@ -351,15 +293,15 @@ document.querySelectorAll('input[name=color]').forEach(r=>r.addEventListener('ch
 
 // font toggle, also settable via ?font=xxx for headless export
 const fontSel = document.getElementById('fontSel');
-const FONT_CLASSES = ['cursive','font-jarman','font-jardotty','font-lms-spelling-bee',
-  'font-kg-primary-dots','font-kg-primary-dots-lined','font-dotness','font-dashness','font-cursive-standard'];
+const FONT_CLASSES = ['cursive','font-cursive-standard'];
 function applyFont(v){
   document.body.classList.remove(...FONT_CLASSES);
   if(v && v!=='print') document.body.classList.add(v==='cursive' ? 'cursive' : 'font-'+v);
 }
 fontSel.addEventListener('change', e=>{ applyFont(e.target.value); applyFontSize(); });
 const _f = new URLSearchParams(location.search).get('font');
-if(_f){ fontSel.value = _f; applyFont(_f); }
+if(_f) fontSel.value = _f;
+applyFont(fontSel.value);
 
 // card width/height (cm), also settable via ?cardw=&cardh=
 const cardWInput = document.getElementById('cardWInput');
@@ -395,8 +337,7 @@ applyOrientation(document.querySelector('input[name=orientation]:checked').value
 
 // word font size (px), "auto" follows each font's built-in default; also settable via ?fontsize=xxx
 const fontSizeSel = document.getElementById('fontSizeSel');
-const DEFAULT_FS = { print:42, cursive:48, jarman:50, jardotty:50, 'lms-spelling-bee':50,
-  'kg-primary-dots':50, 'kg-primary-dots-lined':50, dotness:50, dashness:50, 'cursive-standard':50 };
+const DEFAULT_FS = { print:42, cursive:48, 'cursive-standard':50 };
 function applyFontSize(){
   const v = fontSizeSel.value;
   const px = v==='auto' ? (DEFAULT_FS[fontSel.value] || 42) : parseInt(v,10);
