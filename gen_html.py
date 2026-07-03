@@ -87,7 +87,7 @@ html = r"""<!DOCTYPE html>
   .grouphead .k{ font-size:11px; color:#889; text-transform:uppercase; letter-spacing:.5px; }
 
   /* ---------- Word cards (cut grid) ---------- */
-  .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,calc(var(--page-w) / var(--cols)));
+  .wordgrid{ display:grid; grid-template-columns:repeat(var(--cols),calc(var(--page-w) / var(--cols)));
              border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
   .wcard{ width:calc(var(--page-w) / var(--cols)); height:calc(var(--page-h) / var(--rows)); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
           display:flex; align-items:center; justify-content:center; padding:6px 4px;
