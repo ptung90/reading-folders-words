@@ -189,6 +189,10 @@ html = r"""<!DOCTYPE html>
       <option value="56">56px</option>
       <option value="60">60px</option>
       <option value="64">64px</option>
+      <option value="72">72px</option>
+      <option value="80">80px</option>
+      <option value="90">90px</option>
+      <option value="100">100px</option>
     </select>
   </div>
   <div class="tb-group">
