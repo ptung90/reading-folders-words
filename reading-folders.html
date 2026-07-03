@@ -10,8 +10,8 @@
     --blue:#1565c0;
     --ink:#1a1a1a;
     --cut:#b0b0b0;
-    --card-w:10cm;
-    --card-h:7cm;
+    --cols:2;
+    --rows:3;
     --word-fs:42px;
     --page-w:297mm;
     --page-h:210mm;
@@ -74,9 +74,9 @@
   .grouphead .k{ font-size:11px; color:#889; text-transform:uppercase; letter-spacing:.5px; }
 
   /* ---------- Word cards (cut grid) ---------- */
-  .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,var(--card-w));
+  .wordgrid{ display:grid; grid-template-columns:repeat(auto-fill,calc(var(--page-w) / var(--cols)));
              border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
-  .wcard{ width:var(--card-w); height:var(--card-h); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
+  .wcard{ width:calc(var(--page-w) / var(--cols)); height:calc(var(--page-h) / var(--rows)); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
           display:flex; align-items:center; justify-content:center; padding:6px 4px;
           break-inside:avoid; }
   .wcard .w{ font-size:var(--word-fs); font-weight:700; letter-spacing:.5px; }
@@ -148,10 +148,10 @@
     </div>
   </div>
   <div class="tb-group">
-    <b>Kích thước thẻ (cm)</b>
+    <b>Lưới thẻ (cột × hàng)</b>
     <div style="display:flex;gap:8px;">
-      <label>Ngang <input type="number" id="cardWInput" value="10" min="3" max="21" step="0.5" style="width:56px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
-      <label>Dọc <input type="number" id="cardHInput" value="7" min="2" max="21" step="0.5" style="width:56px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+      <label>Cột <input type="number" id="colsInput" value="2" min="1" max="10" step="1" style="width:52px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+      <label>Hàng <input type="number" id="rowsInput" value="3" min="1" max="10" step="1" style="width:52px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
     </div>
   </div>
   <div class="tb-group">
@@ -290,22 +290,22 @@ const _f = new URLSearchParams(location.search).get('font');
 if(_f) fontSel.value = _f;
 applyFont(fontSel.value);
 
-// card width/height (cm), also settable via ?cardw=&cardh=
-const cardWInput = document.getElementById('cardWInput');
-const cardHInput = document.getElementById('cardHInput');
-function applyCardSize(){
-  const w = parseFloat(cardWInput.value) || 10;
-  const h = parseFloat(cardHInput.value) || 7;
-  document.documentElement.style.setProperty('--card-w', w+'cm');
-  document.documentElement.style.setProperty('--card-h', h+'cm');
+// card grid columns/rows per page (card size = page size / cols,rows), also settable via ?cols=&rows=
+const colsInput = document.getElementById('colsInput');
+const rowsInput = document.getElementById('rowsInput');
+function applyGrid(){
+  const cols = parseInt(colsInput.value, 10) || 2;
+  const rows = parseInt(rowsInput.value, 10) || 3;
+  document.documentElement.style.setProperty('--cols', cols);
+  document.documentElement.style.setProperty('--rows', rows);
 }
-cardWInput.addEventListener('input', applyCardSize);
-cardHInput.addEventListener('input', applyCardSize);
-const _cw = new URLSearchParams(location.search).get('cardw');
-const _ch = new URLSearchParams(location.search).get('cardh');
-if(_cw) cardWInput.value = _cw;
-if(_ch) cardHInput.value = _ch;
-applyCardSize();
+colsInput.addEventListener('input', applyGrid);
+rowsInput.addEventListener('input', applyGrid);
+const _cols = new URLSearchParams(location.search).get('cols');
+const _rows = new URLSearchParams(location.search).get('rows');
+if(_cols) colsInput.value = _cols;
+if(_rows) rowsInput.value = _rows;
+applyGrid();
 
 // paper orientation, also settable via ?orientation=portrait|landscape
 const orientationRadios = document.querySelectorAll('input[name=orientation]');
