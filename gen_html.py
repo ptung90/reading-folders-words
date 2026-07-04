@@ -1,5 +1,5 @@
 # -*- coding: utf-8 -*-
-# Build reading-folders.html (+ index.html for GitHub Pages) from reading-folders-data.json.
+# Build reading-folders.html (+ index.html for GitHub Pages) from reading-folders-data-full.json.
 # Run:  python gen_html.py
 import json, io, os
 
@@ -112,6 +112,10 @@ html = r"""<!DOCTYPE html>
     box-shadow:0 1px 2px rgba(21,101,192,.35); }
   button.print:hover{ filter:brightness(1.08); }
   button.print:active{ transform:translateY(1px); }
+  .databtn{ border:1px solid #c8c5d0; border-radius:5px; background:#fff; color:#3a3843; cursor:pointer;
+    font-size:12px; padding:6px 10px; display:inline-flex; align-items:center; gap:4px; }
+  .databtn:hover{ background:#eef2fb; }
+  .databtn.ghost{ padding:6px 9px; color:#8a8893; font-size:14px; }
 
   @media (max-width:640px){
     .ribbon-tabs{ padding:6px 10px; }
@@ -266,25 +270,51 @@ html = r"""<!DOCTYPE html>
     </div>
   </div>
   <div class="tb-group">
+    <div class="fmt">
+      <button class="databtn" id="importBtn" title="Nhập danh sách từ từ file JSON">📂 Nhập</button>
+      <button class="databtn" id="exportBtn" title="Tải file JSON hiện tại về máy để sửa">💾 Xuất</button>
+      <button class="databtn ghost" id="resetBtn" title="Về danh sách từ mặc định">↺</button>
+    </div>
+  </div>
+  <div class="tb-group">
     <div class="folders-filter" id="folderFilter"></div>
   </div>
+  <input type="file" id="importFile" accept=".json,application/json" hidden>
   </div>
 </div>
 
 <div id="app"></div>
 
 <script>
-const DATA = __DATA__;
+const DEFAULT_DATA = __DATA__;
+let DATA = DEFAULT_DATA;
+try{ const saved = localStorage.getItem('rf-data'); if(saved) DATA = JSON.parse(saved); }catch(e){}
 
-// "b[ai]t" -> "b<span class='sound'>ai</span>t"
+function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+// render a string that already has [..] markers into red-highlighted HTML
 function renderWord(w){
   return w.split(/\[([^\]]+)\]/).map((seg,i)=> i%2 ? '<span class="sound">'+seg+'</span>' : seg).join('');
 }
-function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
-// "surv[ei]llance|30" -> { text:"surv[ei]llance", fs:30 }; trailing |<px> = manual font size
+// auto-mark a PLAIN word for a card's grapheme -> puts [..] around the target sound.
+// idempotent (strips existing brackets), lowercases; if the sound isn't found, returns the word unmarked.
+function markWord(w, g){
+  w = String(w).replace(/[\[\]]/g,'').toLowerCase();
+  if(g.length===3 && g[1]==='-' && g[2]==='e'){          // split digraph X-e (magic-e), e.g. c[a]k[e]
+    const v = g[0];
+    const m = w.match(new RegExp(v+'([^aeiou]+)e$'));
+    if(!m) return w;
+    const vi = m.index;
+    return w.slice(0,vi)+'['+v+']'+w.slice(vi+1,w.length-1)+'[e]';
+  }
+  const i = w.indexOf(g);                                  // contiguous grapheme (first occurrence)
+  return i<0 ? w : w.slice(0,i)+'['+g+']'+w.slice(i+g.length);
+}
+
+// "circumstance|28" -> { text:"circumstance", fs:28 }; trailing |<px> = optional manual font size
 function parseWord(raw){
-  const m = raw.match(/\|(\d+)\s*$/);
+  const m = String(raw).match(/\|(\d+)\s*$/);
   return m ? { text: raw.slice(0, m.index), fs: parseInt(m[1],10) } : { text: raw, fs: null };
 }
 
@@ -292,13 +322,15 @@ const app = document.getElementById('app');
 const filterBox = document.getElementById('folderFilter');
 
 // build folder filter checkboxes (only folders that have any words)
-const nonEmpty = DATA.folders.filter(f => f.cards.some(c=>c.words.length));
-nonEmpty.forEach(f=>{
-  const id='f_'+f.keySound;
-  const lbl=document.createElement('label');
-  lbl.innerHTML='<input type="checkbox" value="'+f.keySound+'" checked> '+f.keySound;
-  filterBox.appendChild(lbl);
-});
+function buildFolderFilter(){
+  filterBox.innerHTML='';
+  DATA.folders.filter(f => f.cards.some(c=>c.words.length)).forEach(f=>{
+    const lbl=document.createElement('label');
+    lbl.innerHTML='<input type="checkbox" value="'+f.keySound+'" checked> '+f.keySound;
+    filterBox.appendChild(lbl);
+  });
+}
+buildFolderFilter();
 
 function selectedFolders(){
   return [...filterBox.querySelectorAll('input:checked')].map(i=>i.value);
@@ -349,15 +381,15 @@ function render(){
     const perPage = Math.max(1, cols * rows);
     // flatten every word across all selected folders/graphemes — no grouping
     const allWords = [];
-    folders.forEach(f=> f.cards.filter(c=>c.words.length).forEach(c=> c.words.forEach(w=> allWords.push(w))));
+    folders.forEach(f=> f.cards.filter(c=>c.words.length).forEach(c=> c.words.forEach(w=> allWords.push({w:w, g:c.grapheme}))));
     const pageCount = Math.ceil(allWords.length / perPage);
     for(let p=0; p<pageCount; p++){
       const pageWords = allWords.slice(p*perPage, (p+1)*perPage);
       out += '<div class="sheet"><div class="pagenum">Trang '+(p+1)+'/'+pageCount+' · '+pageWords.length+' thẻ</div><div class="wordgrid">';
-      pageWords.forEach(w=>{
-        const pw = parseWord(w);
+      pageWords.forEach(item=>{
+        const pw = parseWord(item.w);
         const attr = pw.fs ? ' style="font-size:'+pw.fs+'px" data-fixed="1"' : '';
-        out += '<div class="wcard"><span class="w"'+attr+'>'+renderWord(esc(pw.text))+'</span></div>';
+        out += '<div class="wcard"><span class="w"'+attr+'>'+renderWord(esc(markWord(pw.text, item.g)))+'</span></div>';
       });
       out += '</div></div>';
     }
@@ -371,7 +403,7 @@ function render(){
         out += '<div class="gcard"><div class="head"><span class="g">'+esc(c.grapheme)+'</span>'
              + '<span class="k">folder '+esc(f.keySound)+'</span>'
              + '<span class="n">'+c.words.length+' words</span></div><div class="words">';
-        c.words.forEach(w=>{ out += '<div class="w">'+renderWord(esc(parseWord(w).text))+'</div>'; });
+        c.words.forEach(w=>{ out += '<div class="w">'+renderWord(esc(markWord(parseWord(w).text, c.grapheme)))+'</div>'; });
         out += '</div></div>';
       });
     });
@@ -476,6 +508,43 @@ italicBtn.addEventListener('click', ()=>{
   fitWords();
 });
 if(new URLSearchParams(location.search).get('italic')==='1'){ italicBtn.classList.add('on'); document.body.classList.add('fake-italic'); }
+
+// ---- Import / Export / Reset — edit words as plain JSON (no brackets needed) ----
+function download(name, text, type){
+  const a=document.createElement('a');
+  a.href=URL.createObjectURL(new Blob([text],{type:type||'application/json'}));
+  a.download=name; document.body.appendChild(a); a.click();
+  setTimeout(()=>{ URL.revokeObjectURL(a.href); a.remove(); }, 0);
+}
+document.getElementById('exportBtn').addEventListener('click', ()=>{
+  download('reading-folders-data.json', JSON.stringify(DATA, null, 2));
+});
+const importFile = document.getElementById('importFile');
+document.getElementById('importBtn').addEventListener('click', ()=> importFile.click());
+importFile.addEventListener('change', e=>{
+  const file = e.target.files[0]; if(!file) return;
+  const reader = new FileReader();
+  reader.onload = ()=>{
+    try{
+      const obj = JSON.parse(reader.result);
+      if(!obj || !Array.isArray(obj.folders)) throw new Error('thiếu danh sách "folders"');
+      DATA = obj;
+      try{ localStorage.setItem('rf-data', JSON.stringify(DATA)); }catch(_){}
+      buildFolderFilter(); render();
+      alert('Đã nhập danh sách từ mới ✓');
+    }catch(err){
+      alert('File JSON không hợp lệ: ' + err.message);
+    }
+    importFile.value='';
+  };
+  reader.readAsText(file);
+});
+document.getElementById('resetBtn').addEventListener('click', ()=>{
+  if(!confirm('Về danh sách từ mặc định? (bỏ các thay đổi đã nhập trên máy này)')) return;
+  try{ localStorage.removeItem('rf-data'); }catch(_){}
+  DATA = DEFAULT_DATA;
+  buildFolderFilter(); render();
+});
 
 render();
 </script>

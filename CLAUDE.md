@@ -32,39 +32,44 @@ nhiều thẻ/trang có viền đứt để cắt.
       "keySound": "ai",                       // chữ xanh lá ngoài bìa folder
       "graphemes": ["ai","ay","ei","a-e"],    // danh sách grapheme (để dựng tab)
       "cards": [
-        { "grapheme": "ai",  "words": ["b[ai]t", "r[ai]l"] },
-        { "grapheme": "a-e", "words": ["c[a]k[e]", "s[a]l[e]"] }  // split digraph
+        { "grapheme": "ai",  "words": ["bait", "rail"] },   // TỪ THƯỜNG, không dấu ngoặc
+        { "grapheme": "a-e", "words": ["cake", "sale"] }    // split digraph a-e
       ]
     }
   ]
 }
 ```
 
-### Quy ước marker âm đích — QUAN TRỌNG
-Âm đích (grapheme) được bọc trong **dấu ngoặc vuông `[...]`** ngay trong chuỗi từ:
-- `b[ai]t` → render `b` + `<span class="sound">ai</span>` + `t`
-- `c[a]k[e]` → split digraph `a-e` (magic-e) → tô đỏ **cả** `a` và `e`
+### Quy ước âm đích — QUAN TRỌNG (đã đổi sang tự-tô)
+Data lưu **từ thường, KHÔNG có dấu `[...]`**. App **tự tô đỏ** grapheme của từng card lúc render
+(`markWord()` trong `gen_html.py`), theo quy tắc:
+- Grapheme liền (ai, ee, oo, ge, tion…) → tô **lần xuất hiện đầu tiên**: `bait` (card `ai`) → `b`+<span>ai</span>+`t`.
+- Split digraph `X-e` (a-e, e-e, i-e, o-e, u-e) → regex `X([^aeiou]+)e$` → tô **cả nguyên âm + e cuối**: `cake` → `c`+a+`k`+e.
+- Từ không chứa grapheme của card → hiện trơn, không tô (không lỗi). `markWord` idempotent (strip `[]` cũ) + tự lowercase.
 
-Regex render trong HTML:
-```js
-word.split(/\[([^\]]+)\]/).map((s,i)=> i%2 ? `<span class="sound">${s}</span>` : s).join('')
-word.replace(/[\[\]]/g,'')   // lấy từ gốc (bỏ marker)
-```
+> Nhờ vậy người dùng chỉ cần gõ **từ thường** vào đúng card → không phải học dấu ngoặc.
+> `markWord` là bản port JS của thuật toán trong file build cũ; strip-brackets-rồi-mark = giữ nguyên kết quả.
 
-### Ghi đè cỡ chữ cho 1 từ — hậu tố `|px`
-Thêm `|<số>` vào **cuối** chuỗi từ để ép cỡ chữ riêng cho từ đó **trên thẻ từ** (word card):
-- `surv[ei]llance|30` → chữ đó fix 30px, được đánh dấu `data-fixed` nên **auto-fit không đụng**.
-- Không collide với marker `[...]`. Hậu tố luôn bị strip nên không hiện ra; thẻ grapheme bỏ qua cỡ.
-- Regex tách: `raw.match(/\|(\d+)\s*$/)` (xem `parseWord()` trong `gen_html.py`).
+### Import / Export (cho người không rành kỹ thuật tự sửa)
+Toolbar có nhóm nút **📂 Nhập · 💾 Xuất · ↺** (JSON):
+- **Xuất** → tải `reading-folders-data.json` (từ thường) về máy để sửa.
+- **Nhập** → chọn file JSON đã sửa → nạp + lưu vào `localStorage['rf-data']` (nhớ qua các lần mở).
+- **↺** → xoá localStorage, về `DEFAULT_DATA` (bản build sẵn).
+- `DATA` là `let`, ưu tiên localStorage nếu có; validate tối thiểu `Array.isArray(obj.folders)`.
 
-**Auto-fit (mặc định):** `fitWords()` tự co từ nào rộng hơn ô xuống cho vừa (giảm đều font-size,
-sàn 12px) — chỉ tác động từ **chưa** có `|px`. Chạy sau mỗi render + khi đổi font/cỡ/đậm/nghiêng/lưới/hướng.
+> Đã cân nhắc CSV/Excel nhưng bỏ (Excel Trust Center hay chặn mở Text/CSV trên máy công ty). Sửa JSON bằng JSONedit / JSON Editor Online.
+
+### Ghi đè cỡ chữ cho 1 từ — hậu tố `|px` (tuỳ chọn)
+Thêm `|<số>` cuối từ để ép cỡ chữ riêng **trên thẻ từ**: `circumstance|28` → 28px, `data-fixed` nên **auto-fit không đụng**.
+`parseWord()` tách `|px` trước khi `markWord()` tô. Thẻ grapheme bỏ qua cỡ.
+
+**Auto-fit (mặc định):** `fitWords()` tự co từ nào rộng hơn ô cho vừa (giảm đều font-size, sàn 12px) —
+chỉ tác động từ **chưa** có `|px`. Chạy sau mỗi render + khi đổi font/cỡ/đậm/nghiêng/lưới/hướng.
 
 ### Nguyên tắc khi biên tập data
-- Chỉ giữ từ mà **grapheme của card thực sự xuất hiện** → mọi marker luôn hợp lệ.
-- Bỏ từ PDF xếp nhầm cột (vd `evoke/remote` dưới `e-e`, `deceive` dưới `ie`).
+- Gõ **từ thường** vào đúng card (grapheme của card phải thật sự xuất hiện trong từ thì mới được tô).
 - Từ **lowercase** + **dedup** trong từng card.
-- Muốn ép cỡ 1 từ dài: dùng hậu tố `|px` (vd `circumst[a]nce|28`).
+- Muốn ép cỡ 1 từ dài: hậu tố `|px` (vd `circumstance|28`).
 
 ## Phạm vi dữ liệu (theo đúng PDF gốc)
 14 folder: `ai, ee, ie, oa, ue, or, er, ou, oy, s, j, f, e, shun`.
