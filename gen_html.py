@@ -28,6 +28,7 @@ html = r"""<!DOCTYPE html>
     --word-fs:42px;
     --page-w:297mm;
     --page-h:210mm;
+    --pz:1;              /* preview zoom (shrinks the A4 sheet to fit small screens) */
   }
   *{ box-sizing:border-box; -webkit-print-color-adjust:exact; print-color-adjust:exact; }
   html,body{ margin:0; padding:0; }
@@ -56,27 +57,76 @@ html = r"""<!DOCTYPE html>
   body.font-cursive-standard .wcard .w{ font-family:"Cursive Standard",cursive; }
   body.font-cursive-standard .grouphead .g,body.font-cursive-standard .gcard .head .g,body.font-cursive-standard .gcard .words{ font-family:"Cursive Standard",cursive; }
 
-  /* ---------- Toolbar (screen only) ---------- */
+  /* ---------- Toolbar: MS Word–style ribbon (screen only) ---------- */
   .toolbar{
-    position:sticky; top:0; z-index:10; background:#fff; border-bottom:1px solid #d5d9df;
-    padding:12px 18px; display:flex; flex-wrap:wrap; gap:16px; align-items:flex-end;
-    box-shadow:0 1px 6px rgba(0,0,0,.08);
+    position:sticky; top:0; z-index:10; background:#f3f2f5; border-bottom:1px solid #d7d5dd;
+    box-shadow:0 1px 4px rgba(20,20,40,.07); font-family:"Segoe UI",Arial,sans-serif; color:#26242c;
   }
-  .toolbar h1{ font-size:16px; margin:0 12px 0 0; align-self:center; }
-  .tb-group{ display:flex; flex-direction:column; gap:4px; font-size:12px; }
-  .tb-group b{ font-size:11px; text-transform:uppercase; letter-spacing:.5px; color:#667; }
-  .tb-group label{ font-weight:400; margin-right:8px; white-space:nowrap; }
-  .folders-filter{ max-width:520px; flex-wrap:wrap; display:flex; gap:2px 10px; }
-  button.print{
-    margin-left:auto; background:var(--blue); color:#fff; border:0; border-radius:6px;
-    padding:10px 18px; font-size:14px; font-weight:600; cursor:pointer;
-  }
+  /* tab strip (brand + active tab) — the recognizable ribbon header */
+  .ribbon-tabs{ display:flex; align-items:center; gap:6px; padding:0 12px; min-height:34px;
+    background:linear-gradient(#ffffff,#f6f5f8); border-bottom:1px solid #e4e2ea; flex-wrap:wrap; }
+  .ribbon-tabs .brand{ font-size:13px; font-weight:700; color:var(--blue); letter-spacing:.2px; margin-right:8px; }
+  .ribbon-tabs .tab{ font-size:12px; color:#5a5863; padding:7px 13px 6px; border-bottom:2px solid transparent; }
+  .ribbon-tabs .tab.active{ color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
+
+  /* ribbon body: the wrapping row of grouped controls */
+  .ribbon-body{ display:flex; flex-wrap:wrap; align-items:stretch;
+    padding:0 4px; background:linear-gradient(#fbfbfd,#f1f0f4); }
+  .tb-group{ display:flex; flex-direction:column; align-items:center; justify-content:space-between;
+    gap:6px; padding:8px 12px 4px; min-height:64px; border-right:1px solid #e4e2ea; font-size:12px; }
+  .tb-group > b{ order:2; font-size:10px; font-weight:600; color:#78767f; letter-spacing:.2px;
+    text-transform:none; text-align:center; }
+  .tb-group label{ font-weight:400; margin:0; white-space:nowrap; font-size:12px; }
+  .grid-in{ display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; justify-content:center; }
+  .grid-in .gico{ color:#8a8893; display:inline-flex; }
+
+  /* segmented icon controls (view / orientation / color) — Word-style toggle group */
+  .seg{ display:inline-flex; border:1px solid #c8c5d0; border-radius:5px; overflow:hidden; background:#fff; }
+  .seg button{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:30px;
+    border:0; border-right:1px solid #e2dfe8; background:#fff; color:#403e49; cursor:pointer; padding:0; }
+  .seg button:last-child{ border-right:0; }
+  .seg button:hover{ background:#eef2fb; }
+  .seg button.on{ background:var(--blue); color:#fff; }
+  .seg svg{ width:18px; height:18px; display:block; }
+
+  /* standalone toggle buttons (bold / italic) */
+  .fmt{ display:inline-flex; gap:5px; }
+  .iconbtn{ width:30px; height:30px; border:1px solid #c8c5d0; border-radius:5px; background:#fff;
+    color:#403e49; cursor:pointer; font-size:15px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
+  .iconbtn:hover{ background:#eef2fb; }
+  .iconbtn.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
+  .iconbtn.bold{ font-weight:800; }
+  .iconbtn.ital{ font-family:Georgia,"Times New Roman",serif; font-style:italic; font-size:16px; }
+
+  /* unified compact controls */
+  .toolbar select, .toolbar input[type=number]{ font:inherit; font-size:12px; padding:4px 7px;
+    border:1px solid #c8c5d0; border-radius:4px; background:#fff; color:#1a1a1a; height:28px; cursor:pointer; }
+  .toolbar input[type=number]{ width:54px; cursor:text; }
+  .toolbar select:focus, .toolbar input:focus{ outline:2px solid rgba(21,101,192,.4); border-color:var(--blue); }
+
+  .folders-filter{ max-width:520px; flex-wrap:wrap; display:flex; gap:3px 10px; }
+  button.print{ align-self:center; margin-left:auto; margin-right:6px; background:var(--blue); color:#fff;
+    border:0; border-radius:5px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer;
+    box-shadow:0 1px 2px rgba(21,101,192,.35); }
   button.print:hover{ filter:brightness(1.08); }
-  .hint{ font-size:12px; color:#667; padding:8px 18px 0; }
+  button.print:active{ transform:translateY(1px); }
+  .hint{ font-size:12px; color:#6b6974; padding:8px 14px 0; font-family:"Segoe UI",Arial,sans-serif; }
+
+  @media (max-width:640px){
+    .ribbon-tabs{ padding:6px 10px; }
+    .ribbon-body{ padding:0 2px; }
+    .tb-group{ padding:6px 6px 3px; min-height:0; max-width:100%; }
+    .tb-group label{ white-space:normal; }
+    .seg button{ width:30px; height:28px; }
+    .iconbtn{ width:28px; height:28px; }
+    .toolbar input[type=number]{ width:44px; }
+    .toolbar select{ max-width:52vw; }
+    button.print{ margin:8px; width:calc(100% - 16px); }
+  }
 
   /* ---------- Print sheet ---------- */
   .sheet{ background:#fff; margin:16px auto; padding:0; width:var(--page-w); min-height:var(--page-h);
-          box-shadow:0 2px 12px rgba(0,0,0,.12); }
+          box-shadow:0 2px 12px rgba(0,0,0,.12); zoom:var(--pz,1); }
   .section-title{ font-size:15px; font-weight:700; color:var(--blue); margin:0 0 8px;
                   border-bottom:2px solid var(--blue); padding-bottom:4px; }
 
@@ -141,7 +191,7 @@ html = r"""<!DOCTYPE html>
     .toolbar,.hint{ display:none !important; }
     /* clean cut-grid: hide screen-only labels/badges on paper */
     .section-title,.grouphead,.pagenum{ display:none !important; }
-    .sheet{ margin:0; padding:0; width:auto; min-height:0; box-shadow:none; }
+    .sheet{ margin:0; padding:0; width:auto; min-height:0; box-shadow:none; zoom:1; }
     .sheet + .sheet{ break-before:page; }
   }
 </style>
@@ -149,32 +199,37 @@ html = r"""<!DOCTYPE html>
 <body>
 
 <div class="toolbar">
-  <h1>Reading Folders</h1>
+  <div class="ribbon-tabs">
+    <span class="brand">📖 Reading Folders</span>
+    <span class="tab active">Bố cục &amp; In</span>
+  </div>
+  <div class="ribbon-body">
   <div class="tb-group">
-    <b>View</b>
-    <div>
-      <label><input type="radio" name="view" value="both" checked> Cả hai</label>
-      <label><input type="radio" name="view" value="words"> Thẻ từ</label>
-      <label><input type="radio" name="view" value="graphemes"> Thẻ grapheme</label>
+    <b>Hiển thị</b>
+    <div class="seg" data-name="view">
+      <button data-val="both" class="on" title="Cả hai (thẻ từ + grapheme)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4" width="6.5" height="12" rx="1"/><rect x="11" y="4" width="6.5" height="12" rx="1"/></svg></button>
+      <button data-val="words" title="Chỉ thẻ từ (cắt rời)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="4" width="13" height="12" rx="1"/><line x1="7" y1="10" x2="13" y2="10"/></svg></button>
+      <button data-val="graphemes" title="Chỉ thẻ grapheme"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3.5" width="14" height="13" rx="1"/><line x1="6" y1="7.5" x2="14" y2="7.5"/><line x1="6" y1="10.5" x2="14" y2="10.5"/><line x1="6" y1="13.5" x2="11" y2="13.5"/></svg></button>
     </div>
   </div>
   <div class="tb-group">
-    <b>Khổ giấy</b>
-    <div>
-      <label><input type="radio" name="orientation" value="landscape" checked> Ngang</label>
-      <label><input type="radio" name="orientation" value="portrait"> Dọc</label>
+    <b>Hướng giấy</b>
+    <div class="seg" data-name="orientation">
+      <button data-val="landscape" class="on" title="Khổ ngang (A4 landscape)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="10" rx="1"/></svg></button>
+      <button data-val="portrait" title="Khổ dọc (A4 portrait)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="10" height="16" rx="1"/></svg></button>
     </div>
   </div>
   <div class="tb-group">
-    <b>Lưới thẻ (cột × hàng)</b>
-    <div style="display:flex;gap:8px;">
-      <label>Cột <input type="number" id="colsInput" value="3" min="1" max="10" step="1" style="width:52px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
-      <label>Hàng <input type="number" id="rowsInput" value="3" min="1" max="10" step="1" style="width:52px;padding:5px 6px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;"></label>
+    <b>Lưới thẻ</b>
+    <div class="grid-in">
+      <span class="gico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="14" height="14" rx="1"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="3" y1="13" x2="17" y2="13"/><line x1="8" y1="3" x2="8" y2="17"/><line x1="13" y1="3" x2="13" y2="17"/></svg></span>
+      <label>Cột <input type="number" id="colsInput" value="3" min="1" max="10" step="1"></label>
+      <label>Hàng <input type="number" id="rowsInput" value="3" min="1" max="10" step="1"></label>
     </div>
   </div>
   <div class="tb-group">
-    <b>Font</b>
-    <select id="fontSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
+    <b>Phông chữ</b>
+    <select id="fontSel">
       <option value="print">Chữ in (print)</option>
       <option value="cursive">Chữ viết (system cursive)</option>
       <option value="cursive-standard" selected>Cursive Standard</option>
@@ -182,8 +237,8 @@ html = r"""<!DOCTYPE html>
   </div>
   <div class="tb-group">
     <b>Cỡ chữ</b>
-    <select id="fontSizeSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
-      <option value="auto">Tự động (theo font)</option>
+    <select id="fontSizeSel">
+      <option value="auto">auto</option>
       <option value="28">28px</option>
       <option value="32">32px</option>
       <option value="36">36px</option>
@@ -201,29 +256,25 @@ html = r"""<!DOCTYPE html>
     </select>
   </div>
   <div class="tb-group">
-    <b>Độ đậm</b>
-    <select id="weightSel" style="padding:5px 8px;border:1px solid #c5cbd3;border-radius:5px;font-size:13px;">
-      <option value="auto">Mặc định</option>
-      <option value="normal">Normal (400)</option>
-      <option value="bold">Bold (700)</option>
-    </select>
-  </div>
-  <div class="tb-group">
-    <b>Kiểu</b>
-    <label><input type="checkbox" id="italicChk"> Nghiêng (italic giả)</label>
-  </div>
-  <div class="tb-group">
-    <b>Màu</b>
-    <div>
-      <label><input type="radio" name="color" value="red" checked> Đỏ (Montessori)</label>
-      <label><input type="radio" name="color" value="bw"> Đen trắng</label>
+    <b>Định dạng</b>
+    <div class="fmt">
+      <button class="iconbtn bold on" id="boldBtn" title="Đậm (bold)">B</button>
+      <button class="iconbtn ital" id="italicBtn" title="Nghiêng (italic)">I</button>
     </div>
   </div>
   <div class="tb-group">
-    <b>Folders</b>
+    <b>Màu âm</b>
+    <div class="seg" data-name="color">
+      <button data-val="red" class="on" title="Đỏ (Montessori)"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="#d32f2f"/></svg></button>
+      <button data-val="bw" title="Đen trắng (âm đích gạch chân)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5 a6.5 6.5 0 0 1 0 13 z" fill="currentColor" stroke="none"/></svg></button>
+    </div>
+  </div>
+  <div class="tb-group">
+    <b>Thư mục</b>
     <div class="folders-filter" id="folderFilter"></div>
   </div>
   <button class="print" onclick="window.print()">🖨️ In / Lưu PDF</button>
+  </div>
 </div>
 <div class="hint">Mẹo in PDF: nhấn nút trên (hoặc Ctrl/Cmd+P) → chọn <b>Save as PDF</b> → khổ <b>A4</b> → bật <b>Background graphics</b> để giữ màu đỏ và viền cắt.</div>
 
@@ -259,7 +310,21 @@ nonEmpty.forEach(f=>{
 function selectedFolders(){
   return [...filterBox.querySelectorAll('input:checked')].map(i=>i.value);
 }
-function currentView(){ return document.querySelector('input[name=view]:checked').value; }
+// segmented icon control: exclusive buttons with .on state
+function setupSeg(name, onChange){
+  const seg = document.querySelector('.seg[data-name="'+name+'"]');
+  seg.addEventListener('click', e=>{
+    const btn = e.target.closest('button'); if(!btn) return;
+    seg.querySelectorAll('button').forEach(b=>b.classList.toggle('on', b===btn));
+    onChange(btn.dataset.val);
+  });
+  return {
+    set(v){ let hit=false; seg.querySelectorAll('button').forEach(b=>{ const on=b.dataset.val===v; b.classList.toggle('on', on); hit=hit||on; }); return hit; },
+    get(){ const b=seg.querySelector('button.on'); return b ? b.dataset.val : null; }
+  };
+}
+let _view = 'both';
+function currentView(){ return _view; }
 
 // auto-fit: shrink any word wider than its card (single proportional pass); skip manually-sized words
 const MIN_FIT_FS = 12;
@@ -322,14 +387,15 @@ function render(){
 
   app.innerHTML = out;
   fitWords();
+  fitPreview();
 }
 
 filterBox.addEventListener('change', render);
-document.querySelectorAll('input[name=view]').forEach(r=>r.addEventListener('change', render));
-document.querySelectorAll('input[name=color]').forEach(r=>r.addEventListener('change', e=>{
-  document.body.classList.toggle('bw', e.target.value==='bw');
-  fitWords();
-}));
+const viewSeg = setupSeg('view', v=>{ _view=v; render(); });
+const colorSeg = setupSeg('color', v=>{ document.body.classList.toggle('bw', v==='bw'); fitWords(); });
+// URL params (?view=words&color=bw) for headless export
+const _v = new URLSearchParams(location.search).get('view'); if(_v && viewSeg.set(_v)) _view=_v;
+const _c = new URLSearchParams(location.search).get('color'); if(_c){ colorSeg.set(_c); document.body.classList.toggle('bw', _c==='bw'); }
 
 // font toggle, also settable via ?font=xxx for headless export
 const fontSel = document.getElementById('fontSel');
@@ -362,7 +428,6 @@ if(_rows) rowsInput.value = _rows;
 applyGrid();
 
 // paper orientation, also settable via ?orientation=portrait|landscape
-const orientationRadios = document.querySelectorAll('input[name=orientation]');
 const pageStyleTag = document.createElement('style');
 document.head.appendChild(pageStyleTag);
 function applyOrientation(v){
@@ -371,10 +436,18 @@ function applyOrientation(v){
   document.documentElement.style.setProperty('--page-h', landscape ? '210mm' : '297mm');
   pageStyleTag.textContent = '@page{ size:A4 '+(landscape ? 'landscape' : 'portrait')+'; margin:0; }';
 }
-orientationRadios.forEach(r=>r.addEventListener('change', e=>{ applyOrientation(e.target.value); fitWords(); }));
-const _o = new URLSearchParams(location.search).get('orientation');
-if(_o){ const match=[...orientationRadios].find(r=>r.value===_o); if(match) match.checked=true; }
-applyOrientation(document.querySelector('input[name=orientation]:checked').value);
+const orientSeg = setupSeg('orientation', v=>{ applyOrientation(v); fitWords(); fitPreview(); });
+const _o = new URLSearchParams(location.search).get('orientation'); if(_o) orientSeg.set(_o);
+applyOrientation(orientSeg.get() || 'landscape');
+
+// shrink the A4 preview to fit small screens (screen only) so the page never overflows
+// horizontally — that keeps the ribbon wrapping by viewport width on mobile
+function fitPreview(){
+  const sheetPx = orientSeg.get() === 'portrait' ? 793.7 : 1122.5;   // A4 210mm / 297mm at 96dpi
+  const z = window.innerWidth <= 760 ? Math.min(1, (window.innerWidth - 4) / sheetPx) : 1;
+  document.documentElement.style.setProperty('--pz', z.toFixed(3));
+}
+window.addEventListener('resize', fitPreview);
 
 // word font size (px), "auto" follows each font's built-in default; also settable via ?fontsize=xxx
 const fontSizeSel = document.getElementById('fontSizeSel');
@@ -390,24 +463,21 @@ const _fs = new URLSearchParams(location.search).get('fontsize');
 if(_fs) fontSizeSel.value = _fs;
 applyFontSize();
 
-// font-weight override, also settable via ?weight=xxx
-const weightSel = document.getElementById('weightSel');
-function applyWeight(v){
-  document.body.classList.remove('fw-normal','fw-bold');
-  if(v==='normal') document.body.classList.add('fw-normal');
-  if(v==='bold') document.body.classList.add('fw-bold');
-}
-weightSel.addEventListener('change', e=>{ applyWeight(e.target.value); fitWords(); });
+// bold toggle (on = bold 700, off = normal 400); also settable via ?weight=normal|bold
+const boldBtn = document.getElementById('boldBtn');
+function applyBold(){ document.body.classList.toggle('fw-normal', !boldBtn.classList.contains('on')); fitWords(); }
+boldBtn.addEventListener('click', ()=>{ boldBtn.classList.toggle('on'); applyBold(); });
 const _w = new URLSearchParams(location.search).get('weight');
-if(_w){ weightSel.value = _w; applyWeight(_w); }
+if(_w){ boldBtn.classList.toggle('on', _w!=='normal'); applyBold(); }
 
 // fake italic toggle, also settable via ?italic=1
-const italicChk = document.getElementById('italicChk');
-italicChk.addEventListener('change', e=>{
-  document.body.classList.toggle('fake-italic', e.target.checked);
+const italicBtn = document.getElementById('italicBtn');
+italicBtn.addEventListener('click', ()=>{
+  italicBtn.classList.toggle('on');
+  document.body.classList.toggle('fake-italic', italicBtn.classList.contains('on'));
   fitWords();
 });
-if(new URLSearchParams(location.search).get('italic')==='1'){ italicChk.checked = true; document.body.classList.add('fake-italic'); }
+if(new URLSearchParams(location.search).get('italic')==='1'){ italicBtn.classList.add('on'); document.body.classList.add('fake-italic'); }
 
 render();
 </script>
