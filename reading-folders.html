@@ -77,7 +77,7 @@
   .wordgrid{ display:grid; grid-template-columns:repeat(var(--cols),calc((var(--page-w) - 2px) / var(--cols)));
              border-top:1px dashed var(--cut); border-left:1px dashed var(--cut); }
   .wcard{ width:calc((var(--page-w) - 2px) / var(--cols)); height:calc((var(--page-h) - 2px) / var(--rows)); border-right:1px dashed var(--cut); border-bottom:1px dashed var(--cut);
-          display:flex; align-items:center; justify-content:center; padding:6px 4px;
+          display:flex; align-items:center; justify-content:center; padding:6px 16px;
           break-inside:avoid; }
   /* screen-only page badge so the print pagination is visible in preview */
   .pagenum{ font-family:"Segoe UI",Arial,sans-serif; font-size:11px; color:#889;
@@ -225,6 +225,12 @@ function renderWord(w){
 }
 function esc(s){ return s.replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
 
+// "surv[ei]llance|30" -> { text:"surv[ei]llance", fs:30 }; trailing |<px> = manual font size
+function parseWord(raw){
+  const m = raw.match(/\|(\d+)\s*$/);
+  return m ? { text: raw.slice(0, m.index), fs: parseInt(m[1],10) } : { text: raw, fs: null };
+}
+
 const app = document.getElementById('app');
 const filterBox = document.getElementById('folderFilter');
 
@@ -241,6 +247,23 @@ function selectedFolders(){
   return [...filterBox.querySelectorAll('input:checked')].map(i=>i.value);
 }
 function currentView(){ return document.querySelector('input[name=view]:checked').value; }
+
+// auto-fit: shrink any word wider than its card (single proportional pass); skip manually-sized words
+const MIN_FIT_FS = 12;
+const FIT_MARGIN = 0.90;                     // shrink to 90% of the card width -> more breathing room from the edge
+function fitWords(){
+  app.querySelectorAll('.wcard .w').forEach(span=>{
+    if(span.dataset.fixed) return;          // manual |px — leave exactly as set
+    span.style.fontSize = '';               // reset to global --word-fs before measuring
+    const card = span.parentElement;
+    const cs = getComputedStyle(card);
+    const avail = card.clientWidth - parseFloat(cs.paddingLeft) - parseFloat(cs.paddingRight);
+    if(span.scrollWidth > avail){
+      const cur = parseFloat(getComputedStyle(span).fontSize);
+      span.style.fontSize = Math.max(MIN_FIT_FS, Math.floor(cur * avail / span.scrollWidth * FIT_MARGIN)) + 'px';
+    }
+  });
+}
 
 function render(){
   const sel = new Set(selectedFolders());
@@ -261,7 +284,9 @@ function render(){
       const pageWords = allWords.slice(p*perPage, (p+1)*perPage);
       out += '<div class="sheet"><div class="pagenum">Trang '+(p+1)+'/'+pageCount+' · '+pageWords.length+' thẻ</div><div class="wordgrid">';
       pageWords.forEach(w=>{
-        out += '<div class="wcard"><span class="w">'+renderWord(esc(w))+'</span></div>';
+        const pw = parseWord(w);
+        const attr = pw.fs ? ' style="font-size:'+pw.fs+'px" data-fixed="1"' : '';
+        out += '<div class="wcard"><span class="w"'+attr+'>'+renderWord(esc(pw.text))+'</span></div>';
       });
       out += '</div></div>';
     }
@@ -275,7 +300,7 @@ function render(){
         out += '<div class="gcard"><div class="head"><span class="g">'+esc(c.grapheme)+'</span>'
              + '<span class="k">folder '+esc(f.keySound)+'</span>'
              + '<span class="n">'+c.words.length+' words</span></div><div class="words">';
-        c.words.forEach(w=>{ out += '<div class="w">'+renderWord(esc(w))+'</div>'; });
+        c.words.forEach(w=>{ out += '<div class="w">'+renderWord(esc(parseWord(w).text))+'</div>'; });
         out += '</div></div>';
       });
     });
@@ -283,12 +308,14 @@ function render(){
   }
 
   app.innerHTML = out;
+  fitWords();
 }
 
 filterBox.addEventListener('change', render);
 document.querySelectorAll('input[name=view]').forEach(r=>r.addEventListener('change', render));
 document.querySelectorAll('input[name=color]').forEach(r=>r.addEventListener('change', e=>{
   document.body.classList.toggle('bw', e.target.value==='bw');
+  fitWords();
 }));
 
 // font toggle, also settable via ?font=xxx for headless export
@@ -331,7 +358,7 @@ function applyOrientation(v){
   document.documentElement.style.setProperty('--page-h', landscape ? '210mm' : '297mm');
   pageStyleTag.textContent = '@page{ size:A4 '+(landscape ? 'landscape' : 'portrait')+'; margin:0; }';
 }
-orientationRadios.forEach(r=>r.addEventListener('change', e=>applyOrientation(e.target.value)));
+orientationRadios.forEach(r=>r.addEventListener('change', e=>{ applyOrientation(e.target.value); fitWords(); }));
 const _o = new URLSearchParams(location.search).get('orientation');
 if(_o){ const match=[...orientationRadios].find(r=>r.value===_o); if(match) match.checked=true; }
 applyOrientation(document.querySelector('input[name=orientation]:checked').value);
@@ -343,6 +370,7 @@ function applyFontSize(){
   const v = fontSizeSel.value;
   const px = v==='auto' ? (DEFAULT_FS[fontSel.value] || 42) : parseInt(v,10);
   document.documentElement.style.setProperty('--word-fs', px+'px');
+  fitWords();
 }
 fontSizeSel.addEventListener('change', applyFontSize);
 const _fs = new URLSearchParams(location.search).get('fontsize');
@@ -356,7 +384,7 @@ function applyWeight(v){
   if(v==='normal') document.body.classList.add('fw-normal');
   if(v==='bold') document.body.classList.add('fw-bold');
 }
-weightSel.addEventListener('change', e=>applyWeight(e.target.value));
+weightSel.addEventListener('change', e=>{ applyWeight(e.target.value); fitWords(); });
 const _w = new URLSearchParams(location.search).get('weight');
 if(_w){ weightSel.value = _w; applyWeight(_w); }
 
@@ -364,6 +392,7 @@ if(_w){ weightSel.value = _w; applyWeight(_w); }
 const italicChk = document.getElementById('italicChk');
 italicChk.addEventListener('change', e=>{
   document.body.classList.toggle('fake-italic', e.target.checked);
+  fitWords();
 });
 if(new URLSearchParams(location.search).get('italic')==='1'){ italicChk.checked = true; document.body.classList.add('fake-italic'); }
 

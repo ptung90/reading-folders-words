@@ -50,10 +50,20 @@ word.split(/\[([^\]]+)\]/).map((s,i)=> i%2 ? `<span class="sound">${s}</span>` :
 word.replace(/[\[\]]/g,'')   // lấy từ gốc (bỏ marker)
 ```
 
+### Ghi đè cỡ chữ cho 1 từ — hậu tố `|px`
+Thêm `|<số>` vào **cuối** chuỗi từ để ép cỡ chữ riêng cho từ đó **trên thẻ từ** (word card):
+- `surv[ei]llance|30` → chữ đó fix 30px, được đánh dấu `data-fixed` nên **auto-fit không đụng**.
+- Không collide với marker `[...]`. Hậu tố luôn bị strip nên không hiện ra; thẻ grapheme bỏ qua cỡ.
+- Regex tách: `raw.match(/\|(\d+)\s*$/)` (xem `parseWord()` trong `gen_html.py`).
+
+**Auto-fit (mặc định):** `fitWords()` tự co từ nào rộng hơn ô xuống cho vừa (giảm đều font-size,
+sàn 12px) — chỉ tác động từ **chưa** có `|px`. Chạy sau mỗi render + khi đổi font/cỡ/đậm/nghiêng/lưới/hướng.
+
 ### Nguyên tắc khi biên tập data
 - Chỉ giữ từ mà **grapheme của card thực sự xuất hiện** → mọi marker luôn hợp lệ.
 - Bỏ từ PDF xếp nhầm cột (vd `evoke/remote` dưới `e-e`, `deceive` dưới `ie`).
 - Từ **lowercase** + **dedup** trong từng card.
+- Muốn ép cỡ 1 từ dài: dùng hậu tố `|px` (vd `circumst[a]nce|28`).
 
 ## Phạm vi dữ liệu (theo đúng PDF gốc)
 14 folder: `ai, ee, ie, oa, ue, or, er, ou, oy, s, j, f, e, shun`.
