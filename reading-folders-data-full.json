@@ -18,7 +18,7 @@
     "Full transcription of Reading Folders words (1).pdf; every folder/card the PDF lists usable words for is populated.",
     "Every marker is valid: each kept word actually contains its card's grapheme.",
     "Mis-filed PDF words were MOVED to the correct card, not lost: deceive/conceive/seize -> ai/ei; evoke/erode/elope/remote/telescope -> oa/o-e; elite/expedite -> ie/i-e; relate -> ai/a-e. (emerge already lives in j/ge.)",
-    "Dropped as unfixable in this structure: the OA-folder 'ou' column (four/pour/court/source... = a distinct /or/ sound with no matching card); eject and leisure (ambiguous).",
+    "OA-table 'ou' column split to the right sounds: soul/shoulder/boulder -> oa/ou (/oʊ/); four/pour/court/mourn/source/course/fourth/gourd -> or/our (/ɔː/). Dropped only eject and leisure (ambiguous).",
     "Words are lowercased and de-duplicated per card.",
     "Empty card kept as a frame: j (plain j) — the PDF lists no words for it."
   ],
@@ -508,6 +508,7 @@
       "keySound": "oa",
       "graphemes": [
         "oa",
+        "ou",
         "ow",
         "oe",
         "o-e"
@@ -524,6 +525,14 @@
             "l[oa]f",
             "r[oa]st",
             "t[oa]st"
+          ]
+        },
+        {
+          "grapheme": "ou",
+          "words": [
+            "s[ou]l",
+            "sh[ou]lder",
+            "b[ou]lder"
           ]
         },
         {
@@ -656,7 +665,8 @@
         "or",
         "au",
         "ough",
-        "aw"
+        "aw",
+        "our"
       ],
       "cards": [
         {
@@ -711,6 +721,19 @@
             "y[aw]n",
             "cr[aw]l",
             "d[aw]n"
+          ]
+        },
+        {
+          "grapheme": "our",
+          "words": [
+            "f[our]",
+            "p[our]",
+            "c[our]t",
+            "m[our]n",
+            "s[our]ce",
+            "c[our]se",
+            "f[our]th",
+            "g[our]d"
           ]
         }
       ]

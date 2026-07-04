@@ -4,7 +4,7 @@
 import json, io, os
 
 HERE = os.path.dirname(os.path.abspath(__file__))
-SRC = os.path.join(HERE, "reading-folders-data.json")
+SRC = os.path.join(HERE, "reading-folders-data-full.json")
 OUT = os.path.join(HERE, "reading-folders.html")
 OUT_INDEX = os.path.join(HERE, "index.html")
 
@@ -66,16 +66,18 @@ html = r"""<!DOCTYPE html>
   .ribbon-tabs{ display:flex; align-items:center; gap:6px; padding:0 12px; min-height:34px;
     background:linear-gradient(#ffffff,#f6f5f8); border-bottom:1px solid #e4e2ea; flex-wrap:wrap; }
   .ribbon-tabs .brand{ font-size:13px; font-weight:700; color:var(--blue); letter-spacing:.2px; margin-right:8px; }
-  .ribbon-tabs .tab{ font-size:12px; color:#5a5863; padding:7px 13px 6px; border-bottom:2px solid transparent; }
+  .ribbon-tabs .tab{ font-size:12px; color:#5a5863; padding:7px 13px 6px; border-bottom:2px solid transparent;
+    cursor:pointer; user-select:none; }
   .ribbon-tabs .tab.active{ color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
+  .ribbon-tabs .tab::after{ content:"▾"; font-size:9px; margin-left:6px; opacity:.65; }
+  .toolbar.collapsed .ribbon-tabs .tab::after{ content:"▸"; }
+  .toolbar.collapsed .ribbon-body{ display:none; }
 
   /* ribbon body: the wrapping row of grouped controls */
   .ribbon-body{ display:flex; flex-wrap:wrap; align-items:stretch;
     padding:0 4px; background:linear-gradient(#fbfbfd,#f1f0f4); }
-  .tb-group{ display:flex; flex-direction:column; align-items:center; justify-content:space-between;
-    gap:6px; padding:8px 12px 4px; min-height:64px; border-right:1px solid #e4e2ea; font-size:12px; }
-  .tb-group > b{ order:2; font-size:10px; font-weight:600; color:#78767f; letter-spacing:.2px;
-    text-transform:none; text-align:center; }
+  .tb-group{ display:flex; flex-direction:column; align-items:center; justify-content:center;
+    gap:6px; padding:9px 12px; border-right:1px solid #e4e2ea; font-size:12px; }
   .tb-group label{ font-weight:400; margin:0; white-space:nowrap; font-size:12px; }
   .grid-in{ display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; justify-content:center; }
   .grid-in .gico{ color:#8a8893; display:inline-flex; }
@@ -105,12 +107,11 @@ html = r"""<!DOCTYPE html>
   .toolbar select:focus, .toolbar input:focus{ outline:2px solid rgba(21,101,192,.4); border-color:var(--blue); }
 
   .folders-filter{ max-width:520px; flex-wrap:wrap; display:flex; gap:3px 10px; }
-  button.print{ align-self:center; margin-left:auto; margin-right:6px; background:var(--blue); color:#fff;
+  button.print{ align-self:center; margin:0 10px; background:var(--blue); color:#fff;
     border:0; border-radius:5px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer;
     box-shadow:0 1px 2px rgba(21,101,192,.35); }
   button.print:hover{ filter:brightness(1.08); }
   button.print:active{ transform:translateY(1px); }
-  .hint{ font-size:12px; color:#6b6974; padding:8px 14px 0; font-family:"Segoe UI",Arial,sans-serif; }
 
   @media (max-width:640px){
     .ribbon-tabs{ padding:6px 10px; }
@@ -121,7 +122,6 @@ html = r"""<!DOCTYPE html>
     .iconbtn{ width:28px; height:28px; }
     .toolbar input[type=number]{ width:44px; }
     .toolbar select{ max-width:52vw; }
-    button.print{ margin:8px; width:calc(100% - 16px); }
   }
 
   /* ---------- Print sheet ---------- */
@@ -188,7 +188,7 @@ html = r"""<!DOCTYPE html>
   @page{ size:A4 landscape; margin:0; }
   @media print{
     body{ background:#fff; }
-    .toolbar,.hint{ display:none !important; }
+    .toolbar{ display:none !important; }
     /* clean cut-grid: hide screen-only labels/badges on paper */
     .section-title,.grouphead,.pagenum{ display:none !important; }
     .sheet{ margin:0; padding:0; width:auto; min-height:0; box-shadow:none; zoom:1; }
@@ -205,7 +205,6 @@ html = r"""<!DOCTYPE html>
   </div>
   <div class="ribbon-body">
   <div class="tb-group">
-    <b>Hiển thị</b>
     <div class="seg" data-name="view">
       <button data-val="both" class="on" title="Cả hai (thẻ từ + grapheme)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4" width="6.5" height="12" rx="1"/><rect x="11" y="4" width="6.5" height="12" rx="1"/></svg></button>
       <button data-val="words" title="Chỉ thẻ từ (cắt rời)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="4" width="13" height="12" rx="1"/><line x1="7" y1="10" x2="13" y2="10"/></svg></button>
@@ -213,14 +212,12 @@ html = r"""<!DOCTYPE html>
     </div>
   </div>
   <div class="tb-group">
-    <b>Hướng giấy</b>
     <div class="seg" data-name="orientation">
       <button data-val="landscape" class="on" title="Khổ ngang (A4 landscape)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="10" rx="1"/></svg></button>
       <button data-val="portrait" title="Khổ dọc (A4 portrait)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="10" height="16" rx="1"/></svg></button>
     </div>
   </div>
   <div class="tb-group">
-    <b>Lưới thẻ</b>
     <div class="grid-in">
       <span class="gico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="14" height="14" rx="1"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="3" y1="13" x2="17" y2="13"/><line x1="8" y1="3" x2="8" y2="17"/><line x1="13" y1="3" x2="13" y2="17"/></svg></span>
       <label>Cột <input type="number" id="colsInput" value="3" min="1" max="10" step="1"></label>
@@ -228,7 +225,6 @@ html = r"""<!DOCTYPE html>
     </div>
   </div>
   <div class="tb-group">
-    <b>Phông chữ</b>
     <select id="fontSel">
       <option value="print">Chữ in (print)</option>
       <option value="cursive">Chữ viết (system cursive)</option>
@@ -236,7 +232,6 @@ html = r"""<!DOCTYPE html>
     </select>
   </div>
   <div class="tb-group">
-    <b>Cỡ chữ</b>
     <select id="fontSizeSel">
       <option value="auto">auto</option>
       <option value="28">28px</option>
@@ -256,27 +251,23 @@ html = r"""<!DOCTYPE html>
     </select>
   </div>
   <div class="tb-group">
-    <b>Định dạng</b>
     <div class="fmt">
       <button class="iconbtn bold on" id="boldBtn" title="Đậm (bold)">B</button>
       <button class="iconbtn ital" id="italicBtn" title="Nghiêng (italic)">I</button>
     </div>
   </div>
   <div class="tb-group">
-    <b>Màu âm</b>
     <div class="seg" data-name="color">
       <button data-val="red" class="on" title="Đỏ (Montessori)"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="#d32f2f"/></svg></button>
       <button data-val="bw" title="Đen trắng (âm đích gạch chân)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5 a6.5 6.5 0 0 1 0 13 z" fill="currentColor" stroke="none"/></svg></button>
     </div>
   </div>
   <div class="tb-group">
-    <b>Thư mục</b>
     <div class="folders-filter" id="folderFilter"></div>
   </div>
   <button class="print" onclick="window.print()">🖨️ In / Lưu PDF</button>
   </div>
 </div>
-<div class="hint">Mẹo in PDF: nhấn nút trên (hoặc Ctrl/Cmd+P) → chọn <b>Save as PDF</b> → khổ <b>A4</b> → bật <b>Background graphics</b> để giữ màu đỏ và viền cắt.</div>
 
 <div id="app"></div>
 
@@ -389,6 +380,11 @@ function render(){
   fitWords();
   fitPreview();
 }
+
+// click the ribbon tab to collapse/expand the toolbar (like MS Word)
+document.querySelector('.ribbon-tabs .tab').addEventListener('click', ()=>{
+  document.querySelector('.toolbar').classList.toggle('collapsed');
+});
 
 filterBox.addEventListener('change', render);
 const viewSeg = setupSeg('view', v=>{ _view=v; render(); });

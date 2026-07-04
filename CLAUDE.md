@@ -13,8 +13,9 @@ nhiều thẻ/trang có viền đứt để cắt.
 
 | File | Vai trò |
 |---|---|
-| `reading-folders-data.json` | **Nguồn dữ liệu duy nhất** (single source of truth) — 526 từ |
-| `gen_html.py` | Sinh `reading-folders.html` từ JSON (nhúng data inline). Chạy: `python gen_html.py` |
+| `reading-folders-data-full.json` | **Nguồn dữ liệu chính** (single source of truth) — 772 từ, bản đầy đủ từ PDF (1) |
+| `reading-folders-data.json` | Bản gốc cũ (526 từ) — giữ để tham chiếu, KHÔNG còn build từ file này |
+| `gen_html.py` | Sinh `reading-folders.html` + `index.html` từ `reading-folders-data-full.json` (nhúng data inline). Chạy: `python gen_html.py` |
 | `reading-folders.html` | Trang in — mở bằng trình duyệt, có toolbar chọn tùy chọn rồi Ctrl/Cmd+P |
 | `reading-folders-print.pdf` | PDF bản **chữ in** (Century Gothic) |
 | `reading-folders-cursive.pdf` | PDF bản **chữ viết** (cursive) |
