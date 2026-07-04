@@ -92,7 +92,7 @@ html = r"""<!DOCTYPE html>
   .seg svg{ width:18px; height:18px; display:block; }
 
   /* standalone toggle buttons (bold / italic) */
-  .fmt{ display:inline-flex; gap:5px; }
+  .fmt{ display:inline-flex; gap:8px; align-items:center; }
   .iconbtn{ width:30px; height:30px; border:1px solid #c8c5d0; border-radius:5px; background:#fff;
     color:#403e49; cursor:pointer; font-size:15px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
   .iconbtn:hover{ background:#eef2fb; }
@@ -257,12 +257,14 @@ html = r"""<!DOCTYPE html>
     </div>
   </div>
   <div class="tb-group">
-    <div class="seg" data-name="color">
-      <button data-val="red" class="on" title="Đỏ (Montessori)"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="#d32f2f"/></svg></button>
-      <button data-val="bw" title="Đen trắng (âm đích gạch chân)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5 a6.5 6.5 0 0 1 0 13 z" fill="currentColor" stroke="none"/></svg></button>
+    <div class="fmt">
+      <div class="seg" data-name="color">
+        <button data-val="red" class="on" title="Đỏ (Montessori)"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="#d32f2f"/></svg></button>
+        <button data-val="bw" title="Đen trắng (âm đích gạch chân)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5 a6.5 6.5 0 0 1 0 13 z" fill="currentColor" stroke="none"/></svg></button>
+      </div>
+      <button class="print" onclick="window.print()">🖨️ In / Lưu PDF</button>
     </div>
   </div>
-  <button class="print" onclick="window.print()">🖨️ In / Lưu PDF</button>
   <div class="tb-group">
     <div class="folders-filter" id="folderFilter"></div>
   </div>
