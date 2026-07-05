@@ -61,7 +61,7 @@ html = r"""<!DOCTYPE html>
   .toolbar{
     position:sticky; top:0; z-index:10; background:#f7f7f9; border-bottom:1px solid #d5d7dd;
     box-shadow:0 1px 3px rgba(20,20,40,.06); font-family:"Segoe UI",Arial,sans-serif; color:#333;
-    display:flex; flex-wrap:wrap; align-items:center; gap:2px; padding:5px 8px;
+    display:flex; flex-wrap:wrap; align-items:center; gap:7px 2px; padding:6px 8px;
   }
   /* flat icon button (CKEditor look): borderless, hover grey, active light-blue */
   .tb-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px;
@@ -108,7 +108,7 @@ html = r"""<!DOCTYPE html>
   .folders-filter label:hover{ background:#f0f2f6; }
 
   @media (max-width:640px){
-    .toolbar{ gap:1px; padding:4px; }
+    .toolbar{ gap:7px 1px; padding:5px 4px; }
     .tb-btn{ min-width:28px; height:28px; }
     .toolbar select, .toolbar input[type=number]{ height:28px; font-size:12px; }
     .toolbar select{ max-width:44vw; }
