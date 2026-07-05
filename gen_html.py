@@ -84,7 +84,7 @@ html = r"""<!DOCTYPE html>
 
   /* segmented icon controls (view / orientation / color) — Word-style toggle group */
   .seg{ display:inline-flex; border:1px solid #c8c5d0; border-radius:5px; overflow:hidden; background:#fff; }
-  .seg button{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:30px;
+  .seg button{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:28px;
     border:0; border-right:1px solid #e2dfe8; background:#fff; color:#403e49; cursor:pointer; padding:0; }
   .seg button:last-child{ border-right:0; }
   .seg button:hover{ background:#eef2fb; }
@@ -102,18 +102,18 @@ html = r"""<!DOCTYPE html>
 
   /* unified compact controls */
   .toolbar select, .toolbar input[type=number]{ font:inherit; font-size:12px; padding:4px 7px;
-    border:1px solid #c8c5d0; border-radius:4px; background:#fff; color:#1a1a1a; height:28px; cursor:pointer; }
+    border:1px solid #c8c5d0; border-radius:5px; background:#fff; color:#1a1a1a; height:30px; cursor:pointer; }
   .toolbar input[type=number]{ width:54px; cursor:text; }
   .toolbar select:focus, .toolbar input:focus{ outline:2px solid rgba(21,101,192,.4); border-color:var(--blue); }
 
   .folders-filter{ max-width:520px; flex-wrap:wrap; display:flex; gap:3px 10px; }
   button.print{ align-self:center; margin:0 10px; background:var(--blue); color:#fff;
-    border:0; border-radius:5px; padding:9px 18px; font-size:13px; font-weight:600; cursor:pointer;
+    border:0; border-radius:5px; height:30px; padding:0 16px; font-size:13px; font-weight:600; cursor:pointer;
     box-shadow:0 1px 2px rgba(21,101,192,.35); }
   button.print:hover{ filter:brightness(1.08); }
   button.print:active{ transform:translateY(1px); }
   .databtn{ border:1px solid #c8c5d0; border-radius:5px; background:#fff; color:#3a3843; cursor:pointer;
-    font-size:12px; padding:6px 10px; display:inline-flex; align-items:center; gap:4px; }
+    font-size:12px; height:30px; padding:0 10px; display:inline-flex; align-items:center; gap:4px; }
   .databtn:hover{ background:#eef2fb; }
   .databtn.ghost{ padding:6px 9px; color:#8a8893; font-size:14px; }
 
@@ -126,6 +126,8 @@ html = r"""<!DOCTYPE html>
     .iconbtn{ width:28px; height:28px; }
     .toolbar input[type=number]{ width:44px; }
     .toolbar select{ max-width:52vw; }
+    .toolbar select, .toolbar input[type=number], button.print, .databtn{ height:28px; }
+    button.print{ padding:0 12px; }
   }
 
   /* ---------- Print sheet ---------- */
@@ -249,14 +251,14 @@ html = r"""<!DOCTYPE html>
       <option value="60">60px</option>
       <option value="64">64px</option>
       <option value="72">72px</option>
-      <option value="80">80px</option>
+      <option value="80" selected>80px</option>
       <option value="90">90px</option>
       <option value="100">100px</option>
     </select>
   </div>
   <div class="tb-group">
     <div class="fmt">
-      <button class="iconbtn bold on" id="boldBtn" title="Đậm (bold)">B</button>
+      <button class="iconbtn bold" id="boldBtn" title="Đậm (bold)">B</button>
       <button class="iconbtn ital" id="italicBtn" title="Nghiêng (italic)">I</button>
     </div>
   </div>
@@ -498,7 +500,8 @@ const boldBtn = document.getElementById('boldBtn');
 function applyBold(){ document.body.classList.toggle('fw-normal', !boldBtn.classList.contains('on')); fitWords(); }
 boldBtn.addEventListener('click', ()=>{ boldBtn.classList.toggle('on'); applyBold(); });
 const _w = new URLSearchParams(location.search).get('weight');
-if(_w){ boldBtn.classList.toggle('on', _w!=='normal'); applyBold(); }
+if(_w) boldBtn.classList.toggle('on', _w!=='normal');
+applyBold();   // default: not "on" -> normal (400)
 
 // fake italic toggle, also settable via ?italic=1
 const italicBtn = document.getElementById('italicBtn');
