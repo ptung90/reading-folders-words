@@ -57,77 +57,63 @@ html = r"""<!DOCTYPE html>
   body.font-cursive-standard .wcard .w{ font-family:"Cursive Standard",cursive; }
   body.font-cursive-standard .grouphead .g,body.font-cursive-standard .gcard .head .g,body.font-cursive-standard .gcard .words{ font-family:"Cursive Standard",cursive; }
 
-  /* ---------- Toolbar: MS Word–style ribbon (screen only) ---------- */
+  /* ---------- Toolbar: CKEditor-style flat bar (screen only) ---------- */
   .toolbar{
-    position:sticky; top:0; z-index:10; background:#f3f2f5; border-bottom:1px solid #d7d5dd;
-    box-shadow:0 1px 4px rgba(20,20,40,.07); font-family:"Segoe UI",Arial,sans-serif; color:#26242c;
+    position:sticky; top:0; z-index:10; background:#f7f7f9; border-bottom:1px solid #d5d7dd;
+    box-shadow:0 1px 3px rgba(20,20,40,.06); font-family:"Segoe UI",Arial,sans-serif; color:#333;
+    display:flex; flex-wrap:wrap; align-items:center; gap:2px; padding:5px 8px;
   }
-  /* tab strip (brand + active tab) — the recognizable ribbon header */
-  .ribbon-tabs{ display:flex; align-items:center; gap:6px; padding:0 12px; min-height:34px;
-    background:linear-gradient(#ffffff,#f6f5f8); border-bottom:1px solid #e4e2ea; flex-wrap:wrap; }
-  .ribbon-tabs .brand{ font-size:13px; font-weight:700; color:var(--blue); letter-spacing:.2px; margin-right:8px; }
-  .ribbon-tabs .tab{ font-size:12px; color:#5a5863; padding:7px 13px 6px; border-bottom:2px solid transparent;
-    cursor:pointer; user-select:none; }
-  .ribbon-tabs .tab.active{ color:var(--blue); border-bottom-color:var(--blue); font-weight:600; }
-  .ribbon-tabs .tab::after{ content:"▾"; font-size:9px; margin-left:6px; opacity:.65; }
-  .toolbar.collapsed .ribbon-tabs .tab::after{ content:"▸"; }
-  .toolbar.collapsed .ribbon-body{ display:none; }
+  /* flat icon button (CKEditor look): borderless, hover grey, active light-blue */
+  .tb-btn{ display:inline-flex; align-items:center; justify-content:center; gap:5px;
+    min-width:30px; height:30px; padding:0 6px; border:1px solid transparent; border-radius:4px;
+    background:transparent; color:#3a3d42; cursor:pointer; font-size:13px; line-height:1; }
+  .tb-btn:hover{ background:#e7e9ee; }
+  .tb-btn.on{ background:#dbe7fb; color:var(--blue); }
+  .tb-btn svg{ width:18px; height:18px; display:block; }
+  .tb-btn.bold{ font-weight:800; font-family:Georgia,"Times New Roman",serif; }
+  .tb-btn.ital{ font-style:italic; font-family:Georgia,"Times New Roman",serif; font-size:15px; }
+  .tb-btn.primary{ background:var(--blue); color:#fff; padding:0 12px; font-weight:600; }
+  .tb-btn.primary:hover{ background:#1257a8; }
+  .tb-btn.primary:active{ transform:translateY(1px); }
 
-  /* ribbon body: the wrapping row of grouped controls */
-  .ribbon-body{ display:flex; flex-wrap:wrap; align-items:stretch;
-    padding:0 4px; background:linear-gradient(#fbfbfd,#f1f0f4); }
-  .tb-group{ display:flex; flex-direction:column; align-items:center; justify-content:center;
-    gap:6px; padding:9px 12px; border-right:1px solid #e4e2ea; font-size:12px; }
-  .tb-group label{ font-weight:400; margin:0; white-space:nowrap; font-size:12px; }
-  .grid-in{ display:flex; flex-wrap:wrap; gap:4px 8px; align-items:center; justify-content:center; }
-  .grid-in .gico{ color:#8a8893; display:inline-flex; }
+  .seg{ display:inline-flex; gap:2px; }                         /* group of flat buttons */
+  .tb-sep{ width:1px; align-self:stretch; margin:4px 5px; background:#d5d7dd; }  /* vertical divider */
 
-  /* segmented icon controls (view / orientation / color) — Word-style toggle group */
-  .seg{ display:inline-flex; border:1px solid #c8c5d0; border-radius:5px; overflow:hidden; background:#fff; }
-  .seg button{ display:inline-flex; align-items:center; justify-content:center; width:34px; height:28px;
-    border:0; border-right:1px solid #e2dfe8; background:#fff; color:#403e49; cursor:pointer; padding:0; }
-  .seg button:last-child{ border-right:0; }
-  .seg button:hover{ background:#eef2fb; }
-  .seg button.on{ background:var(--blue); color:#fff; }
-  .seg svg{ width:18px; height:18px; display:block; }
+  /* grid steppers */
+  .tb-grid{ display:inline-flex; align-items:center; gap:5px; color:#3a3d42; font-size:12px; }
+  .tb-grid .gico{ color:#8a8d95; display:inline-flex; }
+  .tb-grid label{ display:inline-flex; align-items:center; gap:3px; white-space:nowrap; }
 
-  /* standalone toggle buttons (bold / italic) */
-  .fmt{ display:inline-flex; gap:8px; align-items:center; }
-  .iconbtn{ width:30px; height:30px; border:1px solid #c8c5d0; border-radius:5px; background:#fff;
-    color:#403e49; cursor:pointer; font-size:15px; line-height:1; display:inline-flex; align-items:center; justify-content:center; }
-  .iconbtn:hover{ background:#eef2fb; }
-  .iconbtn.on{ background:var(--blue); color:#fff; border-color:var(--blue); }
-  .iconbtn.bold{ font-weight:800; }
-  .iconbtn.ital{ font-family:Georgia,"Times New Roman",serif; font-style:italic; font-size:16px; }
+  /* flat selects / number inputs */
+  .toolbar select, .toolbar input[type=number]{ font:inherit; font-size:13px; height:30px;
+    border:1px solid #cdd0d6; border-radius:4px; background:#fff; color:#222; padding:0 6px; cursor:pointer; }
+  .toolbar input[type=number]{ width:46px; padding:0 4px; cursor:text; }
+  .toolbar select:hover{ border-color:#b3b7bf; }
+  .toolbar select:focus, .toolbar input:focus{ outline:2px solid rgba(21,101,192,.35); border-color:var(--blue); }
 
-  /* unified compact controls */
-  .toolbar select, .toolbar input[type=number]{ font:inherit; font-size:12px; padding:4px 7px;
-    border:1px solid #c8c5d0; border-radius:5px; background:#fff; color:#1a1a1a; height:30px; cursor:pointer; }
-  .toolbar input[type=number]{ width:54px; cursor:text; }
-  .toolbar select:focus, .toolbar input:focus{ outline:2px solid rgba(21,101,192,.4); border-color:var(--blue); }
-
-  .folders-filter{ max-width:520px; flex-wrap:wrap; display:flex; gap:3px 10px; }
-  button.print{ align-self:center; margin:0 10px; background:var(--blue); color:#fff;
-    border:0; border-radius:5px; height:30px; padding:0 16px; font-size:13px; font-weight:600; cursor:pointer;
-    box-shadow:0 1px 2px rgba(21,101,192,.35); }
-  button.print:hover{ filter:brightness(1.08); }
-  button.print:active{ transform:translateY(1px); }
-  .databtn{ border:1px solid #c8c5d0; border-radius:5px; background:#fff; color:#3a3843; cursor:pointer;
-    font-size:12px; height:30px; padding:0 10px; display:inline-flex; align-items:center; gap:4px; }
-  .databtn:hover{ background:#eef2fb; }
-  .databtn.ghost{ padding:6px 9px; color:#8a8893; font-size:14px; }
+  /* folder dropdown + popover (replaces the checkbox row) */
+  .tb-dd{ position:relative; display:inline-flex; }
+  .caret{ font-size:9px; opacity:.7; margin-left:1px; }
+  .tb-pop{ position:absolute; top:calc(100% + 5px); left:0; z-index:20; min-width:210px;
+    background:#fff; border:1px solid #cdd0d6; border-radius:6px; box-shadow:0 6px 22px rgba(20,20,40,.17);
+    padding:8px; display:none; }
+  .tb-dd.open .tb-pop{ display:block; }
+  .pop-actions{ display:flex; gap:6px; margin-bottom:6px; }
+  .pop-actions button{ font:inherit; font-size:12px; padding:3px 8px; border:1px solid #cdd0d6;
+    border-radius:4px; background:#f4f5f7; color:#333; cursor:pointer; }
+  .pop-actions button:hover{ background:#e7e9ee; }
+  .folders-filter{ display:flex; flex-direction:column; gap:2px; max-height:260px; overflow:auto; }
+  .folders-filter label{ display:flex; align-items:center; gap:7px; font-size:13px; padding:3px 5px;
+    border-radius:4px; cursor:pointer; white-space:nowrap; }
+  .folders-filter label:hover{ background:#f0f2f6; }
 
   @media (max-width:640px){
-    .ribbon-tabs{ padding:6px 10px; }
-    .ribbon-body{ padding:0 2px; }
-    .tb-group{ padding:6px 6px 3px; min-height:0; max-width:100%; }
-    .tb-group label{ white-space:normal; }
-    .seg button{ width:30px; height:28px; }
-    .iconbtn{ width:28px; height:28px; }
-    .toolbar input[type=number]{ width:44px; }
-    .toolbar select{ max-width:52vw; }
-    .toolbar select, .toolbar input[type=number], button.print, .databtn{ height:28px; }
-    button.print{ padding:0 12px; }
+    .toolbar{ gap:1px; padding:4px; }
+    .tb-btn{ min-width:28px; height:28px; }
+    .toolbar select, .toolbar input[type=number]{ height:28px; font-size:12px; }
+    .toolbar select{ max-width:44vw; }
+    .toolbar input[type=number]{ width:42px; }
+    .tb-sep{ margin:4px 3px; }
   }
 
   /* ---------- Print sheet ---------- */
@@ -205,84 +191,68 @@ html = r"""<!DOCTYPE html>
 <body>
 
 <div class="toolbar">
-  <div class="ribbon-tabs">
-    <span class="brand">📖 Reading Folders</span>
-    <span class="tab active">Bố cục &amp; In</span>
+  <div class="seg" data-name="view">
+    <button class="tb-btn on" data-val="both" title="Cả hai (thẻ từ + grapheme)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4" width="6.5" height="12" rx="1"/><rect x="11" y="4" width="6.5" height="12" rx="1"/></svg></button>
+    <button class="tb-btn" data-val="words" title="Chỉ thẻ từ (cắt rời)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="4" width="13" height="12" rx="1"/><line x1="7" y1="10" x2="13" y2="10"/></svg></button>
+    <button class="tb-btn" data-val="graphemes" title="Chỉ thẻ grapheme"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3.5" width="14" height="13" rx="1"/><line x1="6" y1="7.5" x2="14" y2="7.5"/><line x1="6" y1="10.5" x2="14" y2="10.5"/><line x1="6" y1="13.5" x2="11" y2="13.5"/></svg></button>
   </div>
-  <div class="ribbon-body">
-  <div class="tb-group">
-    <div class="seg" data-name="view">
-      <button data-val="both" class="on" title="Cả hai (thẻ từ + grapheme)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2.5" y="4" width="6.5" height="12" rx="1"/><rect x="11" y="4" width="6.5" height="12" rx="1"/></svg></button>
-      <button data-val="words" title="Chỉ thẻ từ (cắt rời)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3.5" y="4" width="13" height="12" rx="1"/><line x1="7" y1="10" x2="13" y2="10"/></svg></button>
-      <button data-val="graphemes" title="Chỉ thẻ grapheme"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="3" y="3.5" width="14" height="13" rx="1"/><line x1="6" y1="7.5" x2="14" y2="7.5"/><line x1="6" y1="10.5" x2="14" y2="10.5"/><line x1="6" y1="13.5" x2="11" y2="13.5"/></svg></button>
-    </div>
+  <span class="tb-sep"></span>
+  <div class="seg" data-name="orientation">
+    <button class="tb-btn on" data-val="landscape" title="Khổ ngang (A4 landscape)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="10" rx="1"/></svg></button>
+    <button class="tb-btn" data-val="portrait" title="Khổ dọc (A4 portrait)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="10" height="16" rx="1"/></svg></button>
   </div>
-  <div class="tb-group">
-    <div class="seg" data-name="orientation">
-      <button data-val="landscape" class="on" title="Khổ ngang (A4 landscape)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="2" y="5" width="16" height="10" rx="1"/></svg></button>
-      <button data-val="portrait" title="Khổ dọc (A4 portrait)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.6"><rect x="5" y="2" width="10" height="16" rx="1"/></svg></button>
-    </div>
+  <span class="tb-grid">
+    <span class="gico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="14" height="14" rx="1"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="3" y1="13" x2="17" y2="13"/><line x1="8" y1="3" x2="8" y2="17"/><line x1="13" y1="3" x2="13" y2="17"/></svg></span>
+    <label>Cột <input type="number" id="colsInput" value="3" min="1" max="10" step="1"></label>
+    <label>Hàng <input type="number" id="rowsInput" value="3" min="1" max="10" step="1"></label>
+  </span>
+  <span class="tb-sep"></span>
+  <select id="fontSel" title="Phông chữ">
+    <option value="print">Chữ in (print)</option>
+    <option value="cursive">Chữ viết (system cursive)</option>
+    <option value="cursive-standard" selected>Cursive Standard</option>
+  </select>
+  <select id="fontSizeSel" title="Cỡ chữ">
+    <option value="auto">auto</option>
+    <option value="28">28px</option>
+    <option value="32">32px</option>
+    <option value="36">36px</option>
+    <option value="40">40px</option>
+    <option value="44">44px</option>
+    <option value="48">48px</option>
+    <option value="52">52px</option>
+    <option value="56">56px</option>
+    <option value="60">60px</option>
+    <option value="64">64px</option>
+    <option value="72">72px</option>
+    <option value="80" selected>80px</option>
+    <option value="90">90px</option>
+    <option value="100">100px</option>
+  </select>
+  <button class="tb-btn bold" id="boldBtn" title="Đậm (bold)">B</button>
+  <button class="tb-btn ital" id="italicBtn" title="Nghiêng (italic)">I</button>
+  <span class="tb-sep"></span>
+  <div class="seg" data-name="color">
+    <button class="tb-btn on" data-val="red" title="Đỏ (Montessori)"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="#d32f2f"/></svg></button>
+    <button class="tb-btn" data-val="bw" title="Đen trắng (âm đích gạch chân)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5 a6.5 6.5 0 0 1 0 13 z" fill="currentColor" stroke="none"/></svg></button>
   </div>
-  <div class="tb-group">
-    <div class="grid-in">
-      <span class="gico"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><rect x="3" y="3" width="14" height="14" rx="1"/><line x1="3" y1="8" x2="17" y2="8"/><line x1="3" y1="13" x2="17" y2="13"/><line x1="8" y1="3" x2="8" y2="17"/><line x1="13" y1="3" x2="13" y2="17"/></svg></span>
-      <label>Cột <input type="number" id="colsInput" value="3" min="1" max="10" step="1"></label>
-      <label>Hàng <input type="number" id="rowsInput" value="3" min="1" max="10" step="1"></label>
-    </div>
-  </div>
-  <div class="tb-group">
-    <select id="fontSel">
-      <option value="print">Chữ in (print)</option>
-      <option value="cursive">Chữ viết (system cursive)</option>
-      <option value="cursive-standard" selected>Cursive Standard</option>
-    </select>
-  </div>
-  <div class="tb-group">
-    <select id="fontSizeSel">
-      <option value="auto">auto</option>
-      <option value="28">28px</option>
-      <option value="32">32px</option>
-      <option value="36">36px</option>
-      <option value="40">40px</option>
-      <option value="44">44px</option>
-      <option value="48">48px</option>
-      <option value="52">52px</option>
-      <option value="56">56px</option>
-      <option value="60">60px</option>
-      <option value="64">64px</option>
-      <option value="72">72px</option>
-      <option value="80" selected>80px</option>
-      <option value="90">90px</option>
-      <option value="100">100px</option>
-    </select>
-  </div>
-  <div class="tb-group">
-    <div class="fmt">
-      <button class="iconbtn bold" id="boldBtn" title="Đậm (bold)">B</button>
-      <button class="iconbtn ital" id="italicBtn" title="Nghiêng (italic)">I</button>
-    </div>
-  </div>
-  <div class="tb-group">
-    <div class="fmt">
-      <div class="seg" data-name="color">
-        <button data-val="red" class="on" title="Đỏ (Montessori)"><svg viewBox="0 0 20 20"><circle cx="10" cy="10" r="6.5" fill="#d32f2f"/></svg></button>
-        <button data-val="bw" title="Đen trắng (âm đích gạch chân)"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.4"><circle cx="10" cy="10" r="6.5"/><path d="M10 3.5 a6.5 6.5 0 0 1 0 13 z" fill="currentColor" stroke="none"/></svg></button>
+  <span class="tb-sep"></span>
+  <div class="tb-dd" id="folderDD">
+    <button class="tb-btn" id="folderBtn" title="Chọn thư mục để in"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M2.5 6a1 1 0 0 1 1-1H8l1.5 2H16.5a1 1 0 0 1 1 1v6a1 1 0 0 1-1 1h-13a1 1 0 0 1-1-1z"/></svg> Thư mục <span class="caret">▾</span></button>
+    <div class="tb-pop">
+      <div class="pop-actions">
+        <button type="button" id="folderAll">Chọn tất</button>
+        <button type="button" id="folderNone">Bỏ tất</button>
       </div>
-      <button class="print" onclick="window.print()">🖨️ In / Lưu PDF</button>
+      <div class="folders-filter" id="folderFilter"></div>
     </div>
   </div>
-  <div class="tb-group">
-    <div class="fmt">
-      <button class="databtn" id="importBtn" title="Nhập danh sách từ từ file JSON">📂 Nhập</button>
-      <button class="databtn" id="exportBtn" title="Tải file JSON hiện tại về máy để sửa">💾 Xuất</button>
-      <button class="databtn ghost" id="resetBtn" title="Về danh sách từ mặc định">↺</button>
-    </div>
-  </div>
-  <div class="tb-group">
-    <div class="folders-filter" id="folderFilter"></div>
-  </div>
+  <span class="tb-sep"></span>
+  <button class="tb-btn primary print" onclick="window.print()" title="In / Lưu PDF"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M5.5 8V3.5h9V8"/><rect x="3" y="8" width="14" height="6" rx="1"/><rect x="6" y="11.5" width="8" height="5"/></svg> In / Lưu PDF</button>
+  <button class="tb-btn" id="importBtn" title="Nhập từ file JSON"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 3v9"/><path d="M6.5 8.5 10 12l3.5-3.5"/><path d="M4 15.5h12"/></svg></button>
+  <button class="tb-btn" id="exportBtn" title="Xuất file JSON"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M10 12V3"/><path d="M6.5 6.5 10 3l3.5 3.5"/><path d="M4 15.5h12"/></svg></button>
+  <button class="tb-btn" id="resetBtn" title="Về danh sách mặc định"><svg viewBox="0 0 20 20" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M15.5 10a5.5 5.5 0 1 1-1.6-3.9"/><path d="M15.5 3.5V7H12"/></svg></button>
   <input type="file" id="importFile" accept=".json,application/json" hidden>
-  </div>
 </div>
 
 <div id="app"></div>
@@ -417,10 +387,14 @@ function render(){
   fitPreview();
 }
 
-// click the ribbon tab to collapse/expand the toolbar (like MS Word)
-document.querySelector('.ribbon-tabs .tab').addEventListener('click', ()=>{
-  document.querySelector('.toolbar').classList.toggle('collapsed');
-});
+// folder dropdown popover (replaces the old checkbox row)
+const folderDD = document.getElementById('folderDD');
+document.getElementById('folderBtn').addEventListener('click', e=>{ e.stopPropagation(); folderDD.classList.toggle('open'); });
+folderDD.querySelector('.tb-pop').addEventListener('click', e=> e.stopPropagation());
+document.addEventListener('click', ()=> folderDD.classList.remove('open'));
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') folderDD.classList.remove('open'); });
+document.getElementById('folderAll').addEventListener('click', ()=>{ filterBox.querySelectorAll('input').forEach(i=>i.checked=true); render(); });
+document.getElementById('folderNone').addEventListener('click', ()=>{ filterBox.querySelectorAll('input').forEach(i=>i.checked=false); render(); });
 
 filterBox.addEventListener('change', render);
 const viewSeg = setupSeg('view', v=>{ _view=v; render(); });
